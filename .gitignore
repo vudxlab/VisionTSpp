@@ -192,6 +192,8 @@ scipts/*.png
 
 demo.ipynb
 demo_backup.ipynb
+demo_new.ipynb
+
 inference.py
 out.png
 run_tensorboard.txt
