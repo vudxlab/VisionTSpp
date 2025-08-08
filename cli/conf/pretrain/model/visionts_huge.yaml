@@ -1,0 +1,47 @@
+_target_: uni2ts.model.moirai.MoiraiPretrain
+module_kwargs:
+  patch_sizes: ${as_tuple:[1, 1]}
+  max_seq_len: 8192  # 表示输入序列最长的seq_len不会超过8192？
+min_patches: 16
+min_mask_ratio: 0.15
+max_mask_ratio: 0.5
+max_pre_mask_ratio: 0.5
+pre_mask_prob: 0.05
+num_patch_input: 7
+norm_const: 0.4
+# max_dim: 128
+max_dim: 16
+loss_func:
+  _target_: uni2ts.loss.packed.PackedNLLLoss
+lr: 1e-4
+weight_decay: 1e-2
+beta1: 0.9
+beta2: 0.98
+num_training_steps: ${mul:${trainer.max_epochs},${train_dataloader.num_batches_per_epoch}}
+num_warmup_steps: 10_000
+load_ckpt: true
+
+# output_dist: gaussian
+output_dist: quantile
+
+# pixel_loss_weight: 0.5
+# pixel_loss_weight: 0.2
+pixel_loss_weight: 0.0
+
+# pixel_loss_type: huber
+pixel_loss_type: quantile
+
+# loss_topk: 0.7
+loss_topk: 1.0
+nonlinear_dist: false
+
+# 250330 adds:
+model_size: huge
+
+
+# clip_input: 0
+clip_input: 1
+# clip_input: 2
+
+# complete_no_clip: true
+complete_no_clip: false

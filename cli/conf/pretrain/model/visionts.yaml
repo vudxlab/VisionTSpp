@@ -1,0 +1,58 @@
+_target_: uni2ts.model.moirai.MoiraiPretrain
+module_kwargs:
+  patch_sizes: ${as_tuple:[1, 1]}
+  max_seq_len: 8192  # 表示输入序列最长的seq_len不会超过8192？
+min_patches: 16
+min_mask_ratio: 0.15
+max_mask_ratio: 0.5
+max_pre_mask_ratio: 0.5
+pre_mask_prob: 0.05
+num_patch_input: 7
+norm_const: 0.4
+
+# ! 250508 adds: max_dim控制采样的变量个数上限！！
+# max_dim: 128
+max_dim: 16
+# max_dim: 1
+
+loss_func:
+  _target_: uni2ts.loss.packed.PackedNLLLoss
+lr: 1e-4
+weight_decay: 1e-2
+beta1: 0.9
+beta2: 0.98
+num_training_steps: ${mul:${trainer.max_epochs},${train_dataloader.num_batches_per_epoch}}
+num_warmup_steps: 10_000
+
+# ! 250508 adds: load_ckpt选项，用于控制是否加载预训练模型
+load_ckpt: true
+# load_ckpt: false
+
+# output_dist: gaussian
+output_dist: quantile
+
+# pixel_loss_weight: 0.5
+# pixel_loss_weight: 0.2
+pixel_loss_weight: 0.0
+
+# pixel_loss_type: huber
+pixel_loss_type: quantile
+
+# loss_topk: 0.7
+loss_topk: 1.0
+nonlinear_dist: false
+
+
+# ! 250502 adds: clip_input的优先级比complete_no_clip高：
+# ! 即如果clip_input为True，则不再考虑complete_no_clip
+# ! 若clip_input为False，则考虑complete_no_clip
+# clip_input: 0
+clip_input: 1
+# clip_input: 2
+
+# complete_no_clip: true
+complete_no_clip: false
+
+# ! 2505111 adds: adapt_all_params选项，用于控制是否对所有参数进行微调
+# adapt_all_params: true
+adapt_all_params: false
