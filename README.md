@@ -16,13 +16,13 @@
 + In this paper, we propose a new time series foundation model, which performs continual pre-training on the visual backbones. 
 
 <div align="center">
-<img src="figures/teaser.pdf" style="width:80%;" />
+<img src="figures/teaser.png" style="width:80%;" />
 </div>
 
 + Compared to [VisionTS](https://github.com/Keytoyze/VisionTS), VisionTS++ is equipped with three key innovations, therefore more effectively supports multivariate and probablistic time series forecasting.
 
 <div align="center">
-<img src="figures/main_figure.pdf" style="width:80%;" />
+<img src="figures/main_figure.png" style="width:80%;" />
 </div>
 
 ## ⚙️ Installation
