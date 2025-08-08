@@ -9,7 +9,7 @@
 
 ## 🎉 What's New
 
-* 🚩 **News** (Aug 2025): VisionTSpp preprint has been made available on [arXiv](https://arxiv.org/abs/2508.04379). And VisionTSpp-1.0-base model is available in [Huggingface](https://huggingface.co/Lefei/VisionTSpp), which is continually pre-trained on [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/) based on Masked AutoEncoder base (MAE-base) visual backbone.
+* 🚩 **News** (Aug 2025): VisionTSpp preprint has been made available on [arXiv](https://arxiv.org/abs/2508.04379). And VisionTSpp-1.0-base model is available in [Huggingface](https://huggingface.co/Lefei/VisionTSpp), which is continually pre-trained on [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/) based on [Masked AutoEncoder (MAE)](https://github.com/facebookresearch/mae) visual backbone.
 
 ## 🔍 About
 
@@ -34,20 +34,20 @@ git clone https://github.com/HALF111/VisionTSpp.git
 cd VisionTSpp
 ```
 
-2) Create virtual environment:
+2. Create virtual environment:
 
 ```shell
 virtualenv venv
 . venv/bin/activate
 ```
 
-3) Build from source:
+3. Build from source:
 
 ```shell
 pip install -e '.[notebook]'
 ```
 
-4) Create a `.env` file:
+4. Create a `.env` file:
 
 ```shell
 touch .env
@@ -57,15 +57,23 @@ touch .env
 
 We provide the scripts for starting the continual pre-training process on Large-scale Open Time Series Archive (LOTSA data) based on Masked AutoEncoder base (MAE-base) visual backbone.
 
-You should start with preparing the data for pre-training first, by downloading the [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/).
-Assuming you've already createed a `.env` file, run the following commands.
+1. You should start with preparing the data for pre-training first, by downloading the [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/).
+Assuming you've already created a `.env` file, run the following commands.
 
 ```shell
 huggingface-cli download Salesforce/lotsa_data --repo-type=dataset --local-dir PATH_TO_SAVE
 echo "LOTSA_V1_PATH=PATH_TO_SAVE" >> .env
 ```
 
-Then, you can simply run the following script to start the continual pre-training (the same as in [run.sh](https://github.com/HALF111/VisionTSpp/blob/main/run.sh)). 
+2. Afterwards, you should download MAE-base model from following links: [MAE-base](https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_base.pth). You can choose to download [MAE-large](https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large.pth) or [MAE-huge](https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_huge.pth) as well. 
+
+You should also write the path where you save the MAE models in the `.env` file, for example:
+
+```shell
+echo "VISIONTS_CHECKPOINT_PATH=./project/benchmarks/ckpt" >> .env
+```
+
+3. Finally, you can simply run the following script to start the continual pre-training (the same as in [run.sh](https://github.com/HALF111/VisionTSpp/blob/main/run.sh)). 
 
 ```shell
 # base model
@@ -104,4 +112,6 @@ We deeply appreciate the following github repos for their valuable code base or 
 
 + VisionTS [[repo]](https://github.com/Keytoyze/VisionTS)
 + Moirai [[repo]](https://github.com/SalesforceAIResearch/uni2ts)
++ Time-Series-Library [[repo]](https://github.com/thuml/Time-Series-Library)
++ GluonTS [[repo]](https://github.com/awslabs/gluonts)
 
