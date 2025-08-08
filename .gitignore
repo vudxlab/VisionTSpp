@@ -190,10 +190,19 @@ scipts/*.pdf
 scipts/*.png
 
 
-demo.py
-demo_backup.py
+demo.ipynb
+demo_backup.ipynb
 inference.py
 out.png
 run_tensorboard.txt
 run_all.sh
 sorted_ratios.json
+
+.pre-commit-config.yaml
+
+CITATION.cff
+CODE_OF_CONDUCT.md
+CODEOWNERS
+CONTRIBUTING.md
+LICENSE.txt
+SECURITY.md
