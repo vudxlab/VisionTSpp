@@ -9,6 +9,8 @@
 
 ## 🎉 What's New
 
+* **TODO** (Aug 2025): The inference code and the demo code will be released very soon. Please stay tuned!
+
 * 🚩 **News** (Aug 2025): VisionTSpp preprint has been made available on [arXiv](https://arxiv.org/abs/2508.04379). And VisionTSpp-1.0-base model is available in [Huggingface](https://huggingface.co/Lefei/VisionTSpp), which is continually pre-trained on [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/) based on [Masked AutoEncoder (MAE)](https://github.com/facebookresearch/mae) visual backbone.
 
 ## 🔍 About

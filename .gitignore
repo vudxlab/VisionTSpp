@@ -190,7 +190,8 @@ scipts/*.pdf
 scipts/*.png
 
 
-demo.ipynb
+# demo.ipynb
+demo_visionts.ipynb
 demo_backup.ipynb
 demo_new.ipynb
 
