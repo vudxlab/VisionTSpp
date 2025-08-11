@@ -1,11 +1,18 @@
 # VisionTS++
 
+<div align="center">
+<img src="figures/visionts_logo.png" style="width:8%;" /> 
+
 **VisionTS++: Cross-Modal Time Series Foundation Model with Continual Pre-trained Visual Backbones**
 
-[Paper Link](https://arxiv.org/abs/2508.04379) | [Huggingface_model](https://huggingface.co/Lefei/VisionTSpp)
+
+[![VisionTS++_Paper](https://img.shields.io/badge/VisionTS++_Paper-2508.04379-red)](https://arxiv.org/abs/2508.04379)
+[![VisionTS_Paper](https://img.shields.io/badge/VisionTS_Paper-2408.17253-red)](https://arxiv.org/abs/2408.17253)
+[![PyPI - Version](https://img.shields.io/pypi/v/visionts)](#-quick-start)
+[![huggingface](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-FFD21E)](https://huggingface.co/Lefei/VisionTSpp)
 
 
-
+</div>
 
 ## 🎉 What's New
 
@@ -15,7 +22,7 @@
 
 ## 🔍 About
 
-+ In this paper, we propose a new time series foundation model, which performs continual pre-training on the visual backbones. 
++ In this paper, we propose a new time series foundation model, VisionTS++, a SOTA time series foundation model by continual pretraining visual MAE on large-scale time series data, supporting multi-channel forecasting and probablistic forecasting!
 
 <div align="center">
 <img src="figures/teaser.png" style="width:80%;" />
@@ -96,8 +103,17 @@ python -m cli.train -cp conf/pretrain run_name=VisionTSpp_huge  model=visionts_h
 
 If you're using VisionTSpp in your research or applications, please cite it using this BibTeX:
 
-```markdown
-@misc{shen2025visiontscrossmodaltimeseries,
+```bibtex
+@misc{chen2024visionts,
+      title={VisionTS: Visual Masked Autoencoders Are Free-Lunch Zero-Shot Time Series Forecasters}, 
+      author={Mouxiang Chen and Lefei Shen and Zhuo Li and Xiaoyun Joy Wang and Jianling Sun and Chenghao Liu},
+      year={2024},
+      eprint={2408.17253},
+      archivePrefix={arXiv},
+      url={https://arxiv.org/abs/2408.17253}, 
+}
+
+@misc{shen2025visiontspp,
       title={VisionTS++: Cross-Modal Time Series Foundation Model with Continual Pre-trained Visual Backbones}, 
       author={Lefei Shen and Mouxiang Chen and Xu Liu and Han Fu and Xiaoxue Ren and Jianling Sun and Zhuo Li and Chenghao Liu},
       year={2025},
