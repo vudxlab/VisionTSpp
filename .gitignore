@@ -216,4 +216,5 @@ SECURITY.md
 
 .pre-commit-config.yaml
 
+best_model_backup/
 hf_models/
