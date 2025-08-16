@@ -50,9 +50,9 @@ trainer:
   gradient_clip_algorithm: norm
 train_dataloader:
   _target_: uni2ts.data.loader.DataLoader
-  # batch_size: 2048  # 这么大的batch_size？
+  # batch_size: 2048
   # batch_size: 1024
-  batch_size: 512  # 实验后发现512更好，虽然512前期差，但是后面收敛的会更好！而且速度也更快；还节省内存~
+  batch_size: 512  # We experimented with different batch sizes and found that 512 is the best for our model.
   # batch_size: 128
   # batch_size: 16
   batch_size_factor: 1.0
@@ -62,7 +62,7 @@ train_dataloader:
   num_workers: 11
   # num_workers: 0
   collate_fn:
-    _target_: uni2ts.data.loader.PadCollate  # 这里用了pad collate！！
+    _target_: uni2ts.data.loader.PadCollate  # We use pad collate here.
     max_length: ${model.module_kwargs.max_seq_len}
     max_dim: ${model.max_dim}
     seq_fields: ${cls_getattr:${model._target_},seq_fields}

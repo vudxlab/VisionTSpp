@@ -177,6 +177,11 @@ project/benchmarks/pf_results/
 project/benchmarks/results/
 project/benchmarks/tune*.txt
 
+
+scripts/*.pdf
+scripts/*.png
+
+scripts/VisionTS/*.pdf
 scripts/VisionTS/eval_gluonts/results/
 scripts/VisionTS/eval_gluonts/*.csv
 
@@ -186,14 +191,12 @@ scripts/VisionTS/eval_ltsf/test_visual/
 scripts/VisionTS/eval_ltsf/*.pdf
 scripts/VisionTS/eval_ltsf/*.txt
 
-scipts/*.pdf
-scipts/*.png
-
 
 # demo.ipynb
 demo_visionts.ipynb
 demo_backup.ipynb
 demo_new.ipynb
+demo_local.ipynb
 
 inference.py
 out.png

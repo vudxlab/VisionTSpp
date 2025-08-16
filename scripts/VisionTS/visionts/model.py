@@ -26,13 +26,13 @@ MAE_DOWNLOAD_URL = "https://dl.fbaipublicfiles.com/mae/visualize/"
 class VisionTS(nn.Module):
 
     def __init__(self, arch='mae_base', finetune_type='ln', ckpt_dir='./ckpt/', ckpt_path=None, load_ckpt=True, logvar=False, 
-                 quantile=False, clip_input=0, complete_no_clip=False, color=False):
+                 quantile=False, clip_input=0, complete_no_clip=False, color=False, quantile_head_num=9):
         super(VisionTS, self).__init__()
 
         if arch not in MAE_ARCH:
             raise ValueError(f"Unknown arch: {arch}. Should be in {list(MAE_ARCH.keys())}")
 
-        self.vision_model = MAE_ARCH[arch][0](logvar=logvar, quantile=quantile)
+        self.vision_model = MAE_ARCH[arch][0](logvar=logvar, quantile=quantile, quantile_head_num=quantile_head_num)
         self.logvar = logvar
         self.quantile = quantile
         self.clip_input = clip_input
@@ -548,7 +548,7 @@ class VisionTS(nn.Module):
                     print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
                     image_input = torch.clip(image_input, -5, 5)
             else:  # self.clip_input == 1 or self.clip_input == 2
-                # ImageNet的mean和std
+                # mean and std of ImageNet
                 image_mean = [0.485,0.456,0.406]
                 image_std = [0.229,0.224,0.225]
                 # 计算 [-mean/std, (1-mean)/std]，得到的结果如下

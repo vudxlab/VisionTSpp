@@ -78,8 +78,7 @@ class MaskedAutoencoderViT(nn.Module):
             self.decoder_pred_quantile_list = nn.ModuleList()
             for i in range(self.quantile_head_num-1):
                 self.decoder_pred_quantile_list.append(nn.Linear(decoder_embed_dim, patch_size**2 * in_chans, bias=True))  # decoder to patch
-            
-            
+        
         # --------------------------------------------------------------------------
 
         self.initialize_weights()
@@ -272,6 +271,7 @@ class MaskedAutoencoderViT(nn.Module):
 
 def mae_vit_base_patch16_dec512d8b(**kwargs):
     norm = nn.LayerNorm
+    # norm = ChannelLayerNorm
     model = MaskedAutoencoderViT(
         patch_size=16, embed_dim=768, depth=12, num_heads=12,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
