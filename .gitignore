@@ -182,6 +182,9 @@ scripts/*.pdf
 scripts/*.png
 
 scripts/VisionTS/*.pdf
+scripts/VisionTS/demo.py
+scripts/VisionTS/demo.ipynb
+
 scripts/VisionTS/eval_gluonts/results/
 scripts/VisionTS/eval_gluonts/*.csv
 
@@ -212,3 +215,5 @@ LICENSE.txt
 SECURITY.md
 
 .pre-commit-config.yaml
+
+hf_models/
