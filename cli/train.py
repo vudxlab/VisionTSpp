@@ -124,15 +124,12 @@ def main(cfg: DictConfig):
 
     model: L.LightningModule = instantiate(cfg.model, _convert_="all")
     
-    # ! 20250418 adds:
-    # 先backup一份，然后删除掉
+    
+    # backup previous sorted_ratios.txt
     import os
     file_path = "sorted_ratios.txt"
     file_backup = "sorted_ratios_backup.txt"
-    file_back_backup = "sorted_ratios_back_backup.txt"
-    if os.path.exists(file_backup):
-        os.system(f"cp {file_backup} {file_back_backup}")
-    if os.path.exists(file_path):  # 训练开始前如果存在，则将其删掉
+    if os.path.exists(file_path):
         os.system(f"cp {file_path} {file_backup}")
         os.remove(file_path)
     
