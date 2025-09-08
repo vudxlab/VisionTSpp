@@ -35,7 +35,8 @@ class Env:
         "CUSTOM_DATA_PATH",
         "HF_CACHE_PATH",
         "IMAGENET_1K_PATH",
-        "VISIONTS_CHECKPOINT_PATH"
+        "VISIONTS_CHECKPOINT_PATH",
+        # "GIFT_EVAL_PRETRAIN_PATH",  # 250723 adds: path for gift-eval pretrain data
     ]
 
     def __new__(cls):

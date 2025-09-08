@@ -774,6 +774,21 @@ class OthersLOTSADatasetBuilder(LOTSADatasetBuilder):
         "cdc_fluview_who_nrevss",
         "project_tycho",
     ]
+    
+    import os
+    LOTSA_V1_PATH = os.environ.get('LOTSA_V1_PATH')
+    print(f"{LOTSA_V1_PATH = }")
+
+    gift_eval_pop_list = ["restaurant"]
+
+    if "gift_eval" in LOTSA_V1_PATH:
+        for dataset_name in gift_eval_pop_list:
+            if dataset_name in dataset_list:
+                dataset_list.remove(dataset_name)
+
+        print(f"In others: {dataset_list = }")
+    
+    
     dataset_type_map = defaultdict(lambda: TimeSeriesDataset) | {
         dataset: MultiSampleTimeSeriesDataset for dataset in MULTI_SAMPLE_DATASETS
     }
@@ -785,6 +800,7 @@ class OthersLOTSADatasetBuilder(LOTSADatasetBuilder):
         )
         for dataset in MULTI_SAMPLE_DATASETS
     }
+    
 
     def build_dataset(self, dataset: str):
         data_path = (

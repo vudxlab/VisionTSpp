@@ -342,6 +342,32 @@ MULTI_SAMPLE_DATASETS = [
 ]
 
 
+import os
+
+# use os.environ to get envrionment variables
+# port = os.environ.get('ENV_PORT')
+LOTSA_V1_PATH = os.environ.get('LOTSA_V1_PATH')
+print(f"{LOTSA_V1_PATH = }")
+
+gift_eval_pop_list = ["m4_yearly", "m4_hourly", "m4_daily", "m4_weekly", "m4_monthly", "m4_quarterly", 
+                      "us_births", "saugeenday", "temperature_rain_with_missing", "kdd_cup_2018_with_missing",
+                      "car_parts_with_missing",
+                      "hospital", "covid_deaths"]
+
+if "gift_eval" in LOTSA_V1_PATH:
+    for dataset_name in gift_eval_pop_list:
+        if dataset_name in PRETRAIN_GROUP:
+            PRETRAIN_GROUP.remove(dataset_name)
+        if dataset_name in TRAIN_TEST_GROUP:
+            TRAIN_TEST_GROUP.pop(dataset_name)
+        if dataset_name in MULTI_SAMPLE_DATASETS:
+            MULTI_SAMPLE_DATASETS.remove(dataset_name)
+
+    print(f"{PRETRAIN_GROUP = }")
+    print(f"{TRAIN_TEST_GROUP = }")
+    print(f"{MULTI_SAMPLE_DATASETS = }")
+
+
 class GluonTSDatasetBuilder(LOTSADatasetBuilder):
     dataset_list = PRETRAIN_GROUP + list(TRAIN_TEST_GROUP)
     dataset_type_map = defaultdict(lambda: TimeSeriesDataset) | {

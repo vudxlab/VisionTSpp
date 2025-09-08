@@ -25,6 +25,14 @@
 
 </details>
 
+Before starting, you should download MAE checkpoints and put them in the `mae_ckpts` folder. For small model, mae-base is enough.
+```shell
+base: https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_base.pth
+large: https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large.pth
+huge: https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_huge.pth
+```
+
+
 ## 🎉 What's New
 
 * 🚩 **News** (Aug 2025): The inference code is now released! Please try [[demo.ipynb]](https://github.com/HALF111/VisionTSpp/blob/main/demo.ipynb) to run VisionTS++ on multivariate and probablistic time series forecasting.
@@ -67,6 +75,8 @@ Then, you can refer to [[demo.ipynb]](https://github.com/HALF111/VisionTSpp/blob
 
 In this demo, we show VisionTS++'s capability of effectively handling multivariate and probabilistic time series forecasting.
 
+我们的代码借鉴了visionts和uni2ts，表示感谢！
+visiontspp的推理则被放置在参考visionts的repo！！
 
 ## ⚙️ Installation
 

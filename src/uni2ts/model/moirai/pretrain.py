@@ -181,7 +181,9 @@ class MoiraiPretrain(L.LightningModule):
                 checkpoint = torch.load(os.path.join(env.VISIONTS_CHECKPOINT_PATH, "mae_visualize_vit_large.pth"), map_location='cpu')
             elif model_size == "huge":
                 checkpoint = torch.load(os.path.join(env.VISIONTS_CHECKPOINT_PATH, "mae_visualize_vit_huge.pth"), map_location='cpu')
-            print(f"load ckpt: {self.module.load_state_dict(checkpoint['model'], strict=False)}")
+            
+            load_result = self.module.load_state_dict(checkpoint['model'], strict=False)
+            print(f"load ckpt: {load_result}")
         else:
             print("We did not load MAE ckpt!!!")
         
@@ -977,6 +979,7 @@ class MoiraiPretrain(L.LightningModule):
         if self.hparams.adapt_all_params:
             param_dict = {pn: p for pn, p in self.named_parameters() if p.requires_grad}
         else:
+            # 后者只微调norm层，但是感觉并不好？
             param_dict = {pn: p for pn, p in self.named_parameters() if p.requires_grad and "norm" in pn}
         
         # inter_params = decay & no_decay

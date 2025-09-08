@@ -219,3 +219,12 @@ SECURITY.md
 hf_models/
 hf_models/*.ckpt
 
+mae_ckpts/
+mae_ckpts/*.ckpt
+
+lotsa_data/
+
+weighted_7_quantile_512_multi_color_9_heads_best/
+
+app.py
+run_local.sh
