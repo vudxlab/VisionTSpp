@@ -17,19 +17,36 @@
 
 - [VisionTS++](#visionts)
   - [🎉 What's New](#-whats-new)
+  - [🤗 Try Huggingface Space!](#-try-huggingface-space)
   - [🔍 About](#-about)
   - [🚀 Quick Start \& Inference](#-quick-start--inference)
   - [⚙️ Installation](#️-installation)
   - [💻 Continual Pre-training](#-continual-pre-training)
   - [🔗 Citing VisionTS++](#-citing-visionts)
-  - [Acknowledgement](#acknowledgement)
+  - [❤️ Acknowledgement](#️-acknowledgement)
 
 </details>
 
+
 ## 🎉 What's New
 
+* 🚩 **News** (Sep 2025): We release the Hugging Face Space [[VisionTSpp on Huggingface Space]](https://huggingface.co/spaces/Lefei/VisionTSpp) ! You can now quickly experience the forecasting capability of VisionTS++ directly in your browser! You can also upload your own custom time series CSV file for zero-shot forecasting!
 * 🚩 **News** (Aug 2025): The inference code is now released! Please try [[demo.ipynb]](https://github.com/HALF111/VisionTSpp/blob/main/demo.ipynb) to run VisionTS++ on multivariate and probablistic time series forecasting.
-* 🚩 **News** (Aug 2025): VisionTS++ (also called VisionTSpp) preprint has been made available on [arXiv](https://arxiv.org/abs/2508.04379), as well as the training code and pre-trained models. Specifically, we provide the VisionTSpp-1.0-base model on [Huggingface](https://huggingface.co/Lefei/VisionTSpp), which we perform continual pre-traininig on [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/) based on [Masked AutoEncoder (MAE)](https://github.com/facebookresearch/mae) visual backbone.
+* 🚩 **News** (Aug 2025): VisionTS++ (also called VisionTSpp) preprint has been made available on [[arXiv]](https://arxiv.org/abs/2508.04379), as well as the training code and pre-trained models. Specifically, we provide the VisionTSpp-1.0-base model on [[Huggingface]](https://huggingface.co/Lefei/VisionTSpp), which we perform continual pre-traininig on [Large-scale Open Time Series Archive (LOTSA data)](https://huggingface.co/datasets/Salesforce/lotsa_data/) based on [Masked AutoEncoder (MAE)](https://github.com/facebookresearch/mae) visual backbone.
+
+## 🤗 Try Huggingface Space!
+
+🎉 **We’re excited to release the Huggingface Space for VisionTS++!**  
+👉 [Try it now: VisionTSpp on Huggingface Space](https://huggingface.co/spaces/Lefei/VisionTSpp)
+
+Experience the powerful forecasting capabilities of **VisionTS++** instantly — no setup or environment configuration required. Simply open the Space in your browser and start exploring!
+
+Want to test it on your own data? Just upload a custom time series CSV file, and VisionTS++ will perform **zero-shot forecasting** out of the box.
+
+<div align="center">
+<img src="figures/visiontspp_hf_space_ettm1.png" style="width:95%;" />
+</div>
+
 
 ## 🔍 About
 
@@ -161,7 +178,7 @@ If you're using VisionTS++ or VisionTS in your research or applications, please 
 }
 ```
 
-## Acknowledgement
+## ❤️ Acknowledgement
 
 We deeply appreciate the following github repos for their valuable code base or datasets:
 
