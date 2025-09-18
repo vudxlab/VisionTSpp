@@ -203,7 +203,7 @@ demo_local.ipynb
 
 inference.py
 out.png
-run_tensorboard.txt
+# run_tensorboard.txt
 run_all.sh
 sorted_ratios.json
 
@@ -211,19 +211,19 @@ CITATION.cff
 CODE_OF_CONDUCT.md
 CODEOWNERS
 CONTRIBUTING.md
-LICENSE.txt
+# LICENSE.txt
 SECURITY.md
 
 .pre-commit-config.yaml
 
 hf_models/
 hf_models/*.ckpt
-
 mae_ckpts/
 mae_ckpts/*.ckpt
 
 lotsa_data/
 
+deactivate/
 weighted_7_quantile_512_multi_color_9_heads_best/
 
 app.py

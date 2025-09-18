@@ -15,23 +15,16 @@
 <details>
 <summary><strong>Table of Contents</strong></summary>
 
-- [🎉 What's New](#-whats-new)
-- [🔍 About](#-about)
-- [⚙️ Installation](#️-installation)
-- [🚀 Quick Start & Inference](#-quick-start--inference)
-- [💻 Continual Pre-training](#-continual-pre-training)
-- [🔗 Citing VisionTS++](#-citing-visionts)
-- [Acknowledgement](#acknowledgement)
+- [VisionTS++](#visionts)
+  - [🎉 What's New](#-whats-new)
+  - [🔍 About](#-about)
+  - [🚀 Quick Start \& Inference](#-quick-start--inference)
+  - [⚙️ Installation](#️-installation)
+  - [💻 Continual Pre-training](#-continual-pre-training)
+  - [🔗 Citing VisionTS++](#-citing-visionts)
+  - [Acknowledgement](#acknowledgement)
 
 </details>
-
-Before starting, you should download MAE checkpoints and put them in the `mae_ckpts` folder. For small model, mae-base is enough.
-```shell
-base: https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_base.pth
-large: https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large.pth
-huge: https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_huge.pth
-```
-
 
 ## 🎉 What's New
 
@@ -75,8 +68,6 @@ Then, you can refer to [[demo.ipynb]](https://github.com/HALF111/VisionTSpp/blob
 
 In this demo, we show VisionTS++'s capability of effectively handling multivariate and probabilistic time series forecasting.
 
-我们的代码借鉴了visionts和uni2ts，表示感谢！
-visiontspp的推理则被放置在参考visionts的repo！！
 
 ## ⚙️ Installation
 
@@ -90,7 +81,7 @@ cd VisionTSpp
 2. Create virtual environment:
 
 ```shell
-virtualenv venv
+virtualenv venv --python=python3.10
 . venv/bin/activate
 ```
 

@@ -15,12 +15,14 @@ max_dim: 16
 
 loss_func:
   _target_: uni2ts.loss.packed.PackedNLLLoss
-lr: 1e-4
+# lr: 1e-4
+lr: 3e-4
 weight_decay: 1e-2
 beta1: 0.9
 beta2: 0.98
 num_training_steps: ${mul:${trainer.max_epochs},${train_dataloader.num_batches_per_epoch}}
-num_warmup_steps: 10_000
+# num_warmup_steps: 10_000
+num_warmup_steps: 20_000
 
 load_ckpt: true
 
@@ -48,3 +50,5 @@ clip_input: 1
 
 # complete_no_clip: true
 complete_no_clip: false
+
+adapt_all_params: true

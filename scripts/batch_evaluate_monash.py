@@ -49,36 +49,45 @@ for line in lines[st:ed]:
     if os.path.exists(line.replace(".ckpt", "_pf.csv")):
         continue
 
-    if "weighted_5" in line:
-        num_patch_input = 5
-    elif "weighted_7" in line:
-        num_patch_input = 7
-    elif "first_run" in line:
-        num_patch_input = 6
-    else:
-        raise ValueError(line)
+    # if "weighted_5" in line:
+    #     num_patch_input = 5
+    # elif "weighted_7" in line:
+    #     num_patch_input = 7
+    # elif "first_run" in line:
+    #     num_patch_input = 6
+    # else:
+    #     raise ValueError(line)
 
     # ! 20250410 adds:
-    quantile = 'quantile' in line
-    quantile_int = 1 if quantile else 0
+    # quantile = 'quantile' in line
+    # quantile_int = 1 if quantile else 0
     
-    if 'clip_input_new' in line: clip_input = 2
-    elif 'clip_input' in line: clip_input = 1
-    else: clip_input = 0
+    # if 'clip_input_new' in line: clip_input = 2
+    # elif 'clip_input' in line: clip_input = 1
+    # else: clip_input = 0
     
-    if 'complete_no_clip' in line: complete_no_clip = 1
-    else: complete_no_clip = 0
+    # if 'complete_no_clip' in line: complete_no_clip = 1
+    # else: complete_no_clip = 0
     
-    # ! 250426 adds:
-    if 'multi' in line: multivariate = 1
-    else: multivariate = 0
-    # ! 250429 adds:
-    if 'color' in line: color = 1
-    else: color = 0
+    # # ! 250426 adds:
+    # if 'multi' in line: multivariate = 1
+    # else: multivariate = 0
+    # # ! 250429 adds:
+    # if 'color' in line: color = 1
+    # else: color = 0
     
-    # ! 250505 adds: 临时加的用于解决univariate忘加color的问题！！
-    if '9_heads' in line: color = 1
+    # # ! 250505 adds: 临时加的用于解决univariate忘加color的问题！！
+    # if '9_heads' in line: 
+    #     color = 1
     
+    
+    num_patch_input = 7
+    
+    quantile_int = 1
+    clip_input = 1
+    complete_no_clip = 0
+    multivariate = 1
+    color = 1
     
     
     # if not ('epoch=999' in line): 
@@ -111,7 +120,8 @@ for line in lines[st:ed]:
         ]
         print(cmd)
 
-        subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_gluonts")
 
 
 # 2. 再做monash的测试：
@@ -121,36 +131,45 @@ for line in lines[st:ed]:
     if os.path.exists(line.replace(".ckpt", ".csv")):
         continue
 
-    if "weighted_5" in line:
-        num_patch_input = 5
-    elif "weighted_7" in line:
-        num_patch_input = 7
-    elif "first_run" in line:
-        num_patch_input = 6
-    else:
-        raise ValueError(line)
+    # if "weighted_5" in line:
+    #     num_patch_input = 5
+    # elif "weighted_7" in line:
+    #     num_patch_input = 7
+    # elif "first_run" in line:
+    #     num_patch_input = 6
+    # else:
+    #     raise ValueError(line)
 
-    # ! 20250410 adds:
-    quantile = 'quantile' in line
-    quantile_int = 1 if quantile else 0
+    # # ! 20250410 adds:
+    # quantile = 'quantile' in line
+    # quantile_int = 1 if quantile else 0
     
-    if 'clip_input_new' in line: clip_input = 2
-    elif 'clip_input' in line: clip_input = 1
-    else: clip_input = 0
+    # if 'clip_input_new' in line: clip_input = 2
+    # elif 'clip_input' in line: clip_input = 1
+    # else: clip_input = 0
     
-    if 'complete_no_clip' in line: complete_no_clip = 1
-    else: complete_no_clip = 0
+    # if 'complete_no_clip' in line: complete_no_clip = 1
+    # else: complete_no_clip = 0
     
     
-    # ! 250426 adds:
-    if 'multi' in line: multivariate = 1
-    else: multivariate = 0
-    # ! 250429 adds:
-    if 'color' in line: color = 1
-    else: color = 0
+    # # ! 250426 adds:
+    # if 'multi' in line: multivariate = 1
+    # else: multivariate = 0
+    # # ! 250429 adds:
+    # if 'color' in line: color = 1
+    # else: color = 0
     
-    # ! 250505 adds: 临时加的用于解决univariate忘加color的问题！！
-    if '9_heads' in line: color = 1
+    # # ! 250505 adds: 临时加的用于解决univariate忘加color的问题！！
+    # if '9_heads' in line: color = 1
+    
+    
+    num_patch_input = 7
+    
+    quantile_int = 1
+    clip_input = 1
+    complete_no_clip = 0
+    multivariate = 1
+    color = 1
     
     
     # if not ('epoch=999' in line): 
@@ -184,7 +203,8 @@ for line in lines[st:ed]:
         ]
         print(cmd)
 
-        subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_gluonts")
 
 
 
@@ -201,14 +221,14 @@ for line in lines[st:ed]:
         continue
     
     
-    if "weighted_5" in line:
-        num_patch_input = 5
-    elif "weighted_7" in line:
-        num_patch_input = 7
-    elif "first_run" in line:
-        num_patch_input = 6
-    else:
-        raise ValueError(line)
+    # if "weighted_5" in line:
+    #     num_patch_input = 5
+    # elif "weighted_7" in line:
+    #     num_patch_input = 7
+    # elif "first_run" in line:
+    #     num_patch_input = 6
+    # else:
+    #     raise ValueError(line)
 
     
     # 对每个pred_len长度都遍历过去！！
@@ -246,15 +266,16 @@ for line in lines[st:ed]:
             
             if ds == "ETTm1" or ds == "ETTm2":
                 if pred_len == 96:
-                    if not ('epoch=299' in line or 'epoch=599' in line or 'epoch=999' in line): 
+                    if not ('epoch=299' in line or 'epoch=599' in line or 'epoch=999' in line
+                            or 'epoch=1299' in line or 'epoch=1599' in line or 'epoch=1999' in line): 
                         continue
                 else:
-                    if not 'epoch=999' in line: 
+                    if not ('epoch=999' in line or 'epoch=1999' in line): 
                         continue
             
             if ds == "Electricity" or ds == "Weather":
-                # if pred_len > 96: continue
-                if not 'epoch=999' in line: 
+                # if not 'epoch=999' in line: 
+                if not ('epoch=999' in line or 'epoch=1999' in line):
                     continue
 
             
@@ -271,27 +292,36 @@ for line in lines[st:ed]:
                 vm_arch = 'mae_huge'
                 
             
-            # ! 20250410 adds:
-            quantile = 'quantile' in line
-            quantile_int = 1 if quantile else 0
+            # # ! 20250410 adds:
+            # quantile = 'quantile' in line
+            # quantile_int = 1 if quantile else 0
 
-            if 'clip_input_new' in line: clip_input = 2
-            elif 'clip_input' in line: clip_input = 1
-            else: clip_input = 0
+            # if 'clip_input_new' in line: clip_input = 2
+            # elif 'clip_input' in line: clip_input = 1
+            # else: clip_input = 0
             
-            if 'complete_no_clip' in line: complete_no_clip = 1
-            else: complete_no_clip = 0
+            # if 'complete_no_clip' in line: complete_no_clip = 1
+            # else: complete_no_clip = 0
             
-            # ! 250426 adds:
-            if 'multi' in line: multivariate = 1
-            else: multivariate = 0
-            # ! 250429 adds:
-            if 'color' in line: color = 1
-            else: color = 0
+            # # ! 250426 adds:
+            # if 'multi' in line: multivariate = 1
+            # else: multivariate = 0
+            # # ! 250429 adds:
+            # if 'color' in line: color = 1
+            # else: color = 0
             
             
-            # ! 250505 adds: 临时加的用于解决univariate忘加color的问题！！
-            if '9_heads' in line: color = 1
+            # # ! 250505 adds: 临时加的用于解决univariate忘加color的问题！！
+            # if '9_heads' in line: color = 1
+            
+            
+            num_patch_input = 7
+    
+            quantile_int = 1
+            clip_input = 1
+            complete_no_clip = 0
+            multivariate = 1
+            color = 1
                     
             
             # 一些参数
@@ -302,7 +332,8 @@ for line in lines[st:ed]:
                 "--task_name", "long_term_forecast",
                 "--is_training", "1",  # 虽然设置了is_training为1，但由于train_epochs为0，所以仍然没训～
                 "--model", "VisionTS",
-                "--root_path", "./datasets/",
+                # "--root_path", "./datasets/",
+                "--root_path", "~/VisionTSpp/datasets/",
                 "--data_path", f"{ds}.csv",
                 "--save_dir", f"./save/{ds}_{pred_len}",
                 "--model_id", f"VisionTS_{ds}_{pred_len}_{line}",
@@ -325,4 +356,5 @@ for line in lines[st:ed]:
             ]
             print(cmd)
 
-            subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_ltsf")
+            # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_ltsf")
+            subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_ltsf")

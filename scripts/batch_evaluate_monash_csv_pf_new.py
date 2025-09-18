@@ -110,6 +110,9 @@ showed = [
           'weighted_7_quantile_px0.5_quantile_1024_im0.2',
           'weighted_7_quantile_px0.5_quantile_1024_im0.4',
           'weighted_7_quantile_px0.5_quantile_2048_im0.2',
+          
+          'weighted_7_quantile_512_multi_color_9_heads_gift_eval',
+          
         #   'weighted_7_quantile_px0.5_huber_512_im3',
           ] #, 'weighted_7_nlgauss_px0.5_huber_512_missing']
 

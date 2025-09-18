@@ -779,13 +779,14 @@ class OthersLOTSADatasetBuilder(LOTSADatasetBuilder):
     LOTSA_V1_PATH = os.environ.get('LOTSA_V1_PATH')
     print(f"{LOTSA_V1_PATH = }")
 
-    gift_eval_pop_list = ["restaurant"]
+    gift_eval_pop_list = ["restaurant", "hierarchical_sales"]
 
     if "gift_eval" in LOTSA_V1_PATH:
         for dataset_name in gift_eval_pop_list:
             if dataset_name in dataset_list:
                 dataset_list.remove(dataset_name)
-
+            if dataset_name in MULTI_SAMPLE_DATASETS:
+                MULTI_SAMPLE_DATASETS.remove(dataset_name)
         print(f"In others: {dataset_list = }")
     
     

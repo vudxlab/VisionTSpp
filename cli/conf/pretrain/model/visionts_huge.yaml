@@ -45,3 +45,5 @@ clip_input: 1
 
 # complete_no_clip: true
 complete_no_clip: false
+
+adapt_all_params: true

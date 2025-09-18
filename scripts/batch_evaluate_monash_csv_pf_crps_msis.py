@@ -166,9 +166,11 @@ showed = [
           'weighted_7_quantile_512_multi_color_9_heads_large',
           'weighted_7_quantile_512_9_heads',
           'weighted_7_quantile_512_multi_color_9_heads_huge',
-          'weighted_7_quantile_512_multi_color_9_heads_rand_init',
-          'weighted_7_quantile_128_multi_color_9_heads_rand_init',
-          'weighted_7_quantile_512_multi_color_9_heads_ln_only',
+        #   'weighted_7_quantile_512_multi_color_9_heads_rand_init',
+        #   'weighted_7_quantile_128_multi_color_9_heads_rand_init',
+        #   'weighted_7_quantile_512_multi_color_9_heads_ln_only',
+          
+          'weighted_7_quantile_512_multi_color_9_heads_gift_eval',
           
         #   'weighted_7_quantile_1024_clip_input',
           'weighted_7_quantile_1024_filter',

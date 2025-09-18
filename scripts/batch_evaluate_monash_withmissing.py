@@ -12,14 +12,14 @@ VM_ARCH = "mae_base"
 
 def process_csv(csv_path):
 
-    if "weighted_5" in csv_path:
-        num_patch_input = 5
-    elif "weighted_7" in csv_path:
-        num_patch_input = 7
-    elif "first_run" in csv_path:
-        num_patch_input = 6
-    else:
-        raise ValueError(csv_path)
+    # if "weighted_5" in csv_path:
+    #     num_patch_input = 5
+    # elif "weighted_7" in csv_path:
+    #     num_patch_input = 7
+    # elif "first_run" in csv_path:
+    #     num_patch_input = 6
+    # else:
+    #     raise ValueError(csv_path)
 
     df = pd.read_csv(csv_path)
     
@@ -32,16 +32,25 @@ def process_csv(csv_path):
         vm_arch = 'mae_huge'
         
     
-    # ! 20250410 adds:
-    quantile = 'quantile' in csv_path
-    quantile_int = 1 if quantile else 0
+    # # ! 20250410 adds:
+    # quantile = 'quantile' in csv_path
+    # quantile_int = 1 if quantile else 0
 
-    if 'clip_input_new' in csv_path: clip_input = 2
-    elif 'clip_input' in csv_path: clip_input = 1
-    else: clip_input = 0
+    # if 'clip_input_new' in csv_path: clip_input = 2
+    # elif 'clip_input' in csv_path: clip_input = 1
+    # else: clip_input = 0
     
-    if 'complete_no_clip' in csv_path: complete_no_clip = 1
-    else: complete_no_clip = 0
+    # if 'complete_no_clip' in csv_path: complete_no_clip = 1
+    # else: complete_no_clip = 0
+    
+    
+    num_patch_input = 7
+    
+    quantile_int = 1
+    clip_input = 1
+    complete_no_clip = 0
+    multivariate = 1
+    color = 1
     
     
     
@@ -65,10 +74,16 @@ def process_csv(csv_path):
                 "--quantile", str(quantile_int),
                 "--clip_input", str(clip_input),
                 "--complete_no_clip", str(complete_no_clip),
+                "--multivariate", str(multivariate),
+                "--color", str(color),
             ]
             print(cmd)
-            subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+            
+            # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+            subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_gluonts")
+            
             new_df = pd.read_csv(tmp_file)
+        
         return new_df.iloc[0]
 
     df: pd.DataFrame = df.apply(map_process, axis=1)

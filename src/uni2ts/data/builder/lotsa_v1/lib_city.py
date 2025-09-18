@@ -47,6 +47,19 @@ class LibCityDatasetBuilder(LOTSADatasetBuilder):
         "SHMETRO",
         "SZ_TAXI",
     ]
+    
+    import os
+    LOTSA_V1_PATH = os.environ.get('LOTSA_V1_PATH')
+    print(f"{LOTSA_V1_PATH = }")
+
+    gift_eval_pop_list = ["LOOP_SEATTLE", "SZ_TAXI", "M_DENSE"]
+
+    if "gift_eval" in LOTSA_V1_PATH:
+        for dataset_name in gift_eval_pop_list:
+            if dataset_name in dataset_list:
+                dataset_list.remove(dataset_name)
+        print(f"In others: {dataset_list = }")
+    
     dataset_type_map = defaultdict(lambda: MultiSampleTimeSeriesDataset)
     dataset_load_func_map = defaultdict(
         lambda: partial(

@@ -192,7 +192,7 @@ class VisionTS(nn.Module):
         ], dim=-1)
         image_input = einops.repeat(x_concat_with_masked, 'b 1 h w -> b c h w', c=3)
         
-        print(f"{image_input.shape = }")
+        # print(f"{image_input.shape = }")
         # print(f"{image_input = }")
         if self.clip_input == 0:
             if self.complete_no_clip:

@@ -28,6 +28,7 @@ NORM_CONST=0.4
 VM_ARCH="mae_base"
 
 
+# change to your own path
 line = "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads/checkpoints/processed_epoch=999-step=100000.ckpt"
 
 
@@ -91,7 +92,8 @@ for pred_len in ltsf_pred_len_list:
             "--task_name", "long_term_forecast",
             "--is_training", "1",  # 虽然设置了is_training为1，但由于train_epochs为0，所以仍然没训～
             "--model", "VisionTS",
-            "--root_path", "./datasets/",
+            # "--root_path", "./datasets/",
+            "--root_path", "~/VisionTSpp/datasets/",
             "--data_path", f"{ds}.csv",
             "--save_dir", f"./test_visual/{ds}_{pred_len}",
             "--model_id", f"VisionTS_{ds}_{pred_len}_{line}",
@@ -117,4 +119,5 @@ for pred_len in ltsf_pred_len_list:
         ]
         print(cmd)
 
-        subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_ltsf")
+        # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_ltsf")
+        subprocess.run(cmd, cwd="/home/lefeishen/uni2ts/scripts/VisionTS/eval_ltsf")

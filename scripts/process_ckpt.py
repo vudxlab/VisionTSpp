@@ -47,7 +47,8 @@ def process_ckpt_files(input_dir_list):
                         continue
                     try:
                         # 加载ckpt文件
-                        checkpoint = torch.load(ckpt_path, map_location="cpu")
+                        # checkpoint = torch.load(ckpt_path, map_location="cpu")
+                        checkpoint = torch.load(ckpt_path, map_location="cpu", weights_only=False)
                         
                         # 提取state_dict
                         if 'state_dict' in checkpoint or 'epoch=0-step=00000.ckpt' in file:
@@ -96,54 +97,57 @@ def process_ckpt_files(input_dir_list):
 
 # 使用示例
 
-input_directory = "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts"  # 修改为你的输入目录路径
-input_directory = "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_nopre/lotsa_v1_weighted/weighted_5_rd"  # 修改为你的输入目录路径
+# input_directory = "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts"  # 修改为你的输入目录路径
+# input_directory = "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_nopre/lotsa_v1_weighted/weighted_5_rd"  # 修改为你的输入目录路径
 
-# input_directory = ["/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512_top5", 
-#                     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512_top7", 
-#                     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512", 
-#                     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.2_huber_512", 
-#                     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber", 
-#                     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss", 
-#                     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7"]
+# input_directory = ["/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512_top5", 
+#                     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512_top7", 
+#                     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512", 
+#                     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.2_huber_512", 
+#                     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber", 
+#                     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss", 
+#                     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7"]
 
-# input_directory = ["/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_gauss_px0.5_huber_2048_im2/checkpoints", 
-#                    "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_2048"]
+# input_directory = ["/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_gauss_px0.5_huber_2048_im2/checkpoints", 
+#                    "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_2048"]
 
 input_directory = [
-                #    "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_gauss_px0.5_huber_2048_im2", 
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512_im3",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.2_huber_512",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_2048",
-                #    "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_px0.5_huber_2048",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_px0.5_huber_512",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_px0_512",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_512_im0.2",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_1024_im0.2",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_1024_im0.4", 
-                #    "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_2048_im0.2", 
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_large/lotsa_v1_weighted/weighted_7_1024_large", 
-                #    "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_huge/lotsa_v1_weighted/weighted_7_512_huge", 
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_huge/lotsa_v1_weighted/weighted_7_1024_huge", 
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_1024", 
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_clip_input",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_clip_input_new",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_complete_no_clip",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_1024_clip_input",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_filter",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_1024_filter",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_large/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_large",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_9_heads",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_huge/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_huge",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_rand_init",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_128_multi_color_9_heads_rand_init",
-                   "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_ln_only",
+                #    "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_gauss_px0.5_huber_2048_im2", 
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512_im3",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_512",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.2_huber_512",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_gauss_px0.5_huber_2048",
+                #    "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_px0.5_huber_2048",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_px0.5_huber_512",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_px0_512",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_512_im0.2",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_1024_im0.2",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_1024_im0.4", 
+                #    "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_quantile_2048_im0.2", 
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_large/lotsa_v1_weighted/weighted_7_1024_large", 
+                #    "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_huge/lotsa_v1_weighted/weighted_7_512_huge", 
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_huge/lotsa_v1_weighted/weighted_7_1024_huge", 
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_1024", 
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_clip_input",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_clip_input_new",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_complete_no_clip",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_1024_clip_input",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_filter",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_1024_filter",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_large/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_large",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_9_heads",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_huge/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_huge",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_rand_init",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_128_multi_color_9_heads_rand_init",
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_ln_only",
+                   
+                   # 250909 adds:
+                   "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted/weighted_7_quantile_512_multi_color_9_heads_gift_eval"
                     
-                #    "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_huber_512_im3",
+                #    "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image/weighted_7_quantile_px0.5_huber_512_im3",
                   ]
 
 process_ckpt_files(input_directory)

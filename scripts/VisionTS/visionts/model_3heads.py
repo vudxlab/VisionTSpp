@@ -168,7 +168,7 @@ class VisionTS(nn.Module):
         
         # ! 250429 adds: nvars在这里获取可能更合适？
         self.nvars = x.shape[-1]  # 这里最后一维就是nvars！！
-        print(f"{self.nvars = }")
+        # print(f"{self.nvars = }")
         
         # self.input_resize = util.safe_resize((self.image_size, int(self.image_size * self.adjust_input_ratio)), interpolation=self.interpolation)
         # ! 这里的image_size_per_var是224/nvars，表示每个变量对应224/nvars个像素点。
@@ -269,7 +269,7 @@ class VisionTS(nn.Module):
         
         
         
-        print(f"{image_input.shape = }")
+        # print(f"{image_input.shape = }")
         # print(f"{image_input = }")
         if self.clip_input == 0:
             if self.complete_no_clip:

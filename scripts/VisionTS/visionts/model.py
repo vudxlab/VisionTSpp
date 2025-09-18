@@ -168,7 +168,7 @@ class VisionTS(nn.Module):
         
         # ! 250429 adds: nvars在这里获取可能更合适？
         self.nvars = x.shape[-1]  # 这里最后一维就是nvars！！
-        print(f"{self.nvars = }")
+        # print(f"{self.nvars = }")
         
         # self.input_resize = util.safe_resize((self.image_size, int(self.image_size * self.adjust_input_ratio)), interpolation=self.interpolation)
         # ! 这里的image_size_per_var是224/nvars，表示每个变量对应224/nvars个像素点。
@@ -275,14 +275,14 @@ class VisionTS(nn.Module):
         
         
         
-        print(f"{image_input.shape = }")
+        # print(f"{image_input.shape = }")
         # print(f"{image_input = }")
         if self.clip_input == 0:
             if self.complete_no_clip:
-                print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
-                # pass
+                # print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
+                pass
             else:
-                print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
+                # print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
                 image_input = torch.clip(image_input, -5, 5)
         else:  # self.clip_input == 1 or self.clip_input == 2
             # ImageNet的mean和std
@@ -294,7 +294,7 @@ class VisionTS(nn.Module):
             thres_down = -1.8044
             thres_up = 2.2489
             
-            print(f"image_input > {thres_up}: {torch.any((image_input > thres_up))}, image_input < {thres_down}: {torch.any((image_input < thres_down))}")
+            # print(f"image_input > {thres_up}: {torch.any((image_input > thres_up))}, image_input < {thres_down}: {torch.any((image_input < thres_down))}")
             
             image_input = torch.clip(image_input, thres_down, thres_up)
             
@@ -538,14 +538,14 @@ class VisionTS(nn.Module):
                     image_input[:, color, i*self.image_size_per_var:(i+1)*self.image_size_per_var, :] = \
                         x_concat_with_masked[:, 0, i*self.image_size_per_var:(i+1)*self.image_size_per_var, :]
             
-            print(f"{image_input.shape = }")
+            # print(f"{image_input.shape = }")
             # print(f"{image_input = }")
             if self.clip_input == 0:
                 if self.complete_no_clip:
-                    print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
-                    # pass
+                    # print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
+                    pass
                 else:
-                    print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
+                    # print(f"image_input > 5: {torch.any((image_input > 5))}, image_input < -5: {torch.any((image_input < -5))}")
                     image_input = torch.clip(image_input, -5, 5)
             else:  # self.clip_input == 1 or self.clip_input == 2
                 # mean and std of ImageNet
@@ -557,7 +557,7 @@ class VisionTS(nn.Module):
                 thres_down = -1.8044
                 thres_up = 2.2489
                 
-                print(f"image_input > {thres_up}: {torch.any((image_input > thres_up))}, image_input < {thres_down}: {torch.any((image_input < thres_down))}")
+                # print(f"image_input > {thres_up}: {torch.any((image_input > thres_up))}, image_input < {thres_down}: {torch.any((image_input < thres_down))}")
                 
                 image_input = torch.clip(image_input, thres_down, thres_up)
             

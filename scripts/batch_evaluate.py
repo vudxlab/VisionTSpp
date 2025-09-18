@@ -15,28 +15,29 @@ while True:
         subprocess.run(cmd)
         cmd = [
             "python", "batch_evaluate_monash_withmissing.py", 
-            "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted"
+            # "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted"
+            "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted"
         ]
         subprocess.run(cmd)
         cmd = [
             "python", "batch_evaluate_monash_withmissing.py", 
-            "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts/lotsa_v1_weighted_image"
+            "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts/lotsa_v1_weighted_image"
         ]
         # ! 250401 adds: 新增mae_large!!
         subprocess.run(cmd)
         cmd = [
             "python", "batch_evaluate_monash_withmissing.py", 
-            "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_large/lotsa_v1_weighted"
+            "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_large/lotsa_v1_weighted"
         ]
         subprocess.run(cmd)
         # subprocess.run(cmd)
         # cmd = [
         #     "python", "batch_evaluate_monash_withmissing.py", 
-        #     "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_large/lotsa_v1_weighted_image"
+        #     "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_large/lotsa_v1_weighted_image"
         # ]
         cmd = [
             "python", "batch_evaluate_monash_withmissing.py", 
-            "/home/mouxiangchen/uni2ts/outputs/pretrain/visionts_huge/lotsa_v1_weighted"
+            "/home/lefeishen/VisionTSpp/outputs/pretrain/visionts_huge/lotsa_v1_weighted"
         ]
         subprocess.run(cmd)
         

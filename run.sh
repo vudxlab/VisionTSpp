@@ -10,3 +10,4 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m cli.train -cp conf/pretrain run_name=weig
 
 # huge model:
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m cli.train -cp conf/pretrain run_name=weighted_7_quantile_512_multi_color_9_heads_huge  model=visionts_huge data=lotsa_v1_weighted
+

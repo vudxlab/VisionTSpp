@@ -85,7 +85,9 @@ for line in lines[st:ed]:
         ]
         print(cmd)
 
-        subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_gluonts")
+        
 
 
 # 2. 再做monash的测试：
@@ -133,7 +135,8 @@ for line in lines[st:ed]:
         ]
         print(cmd)
 
-        subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_gluonts")
+        subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_gluonts")
 
 
 
@@ -218,7 +221,8 @@ for line in lines[st:ed]:
                 "--task_name", "long_term_forecast",
                 "--is_training", "1",  # 虽然设置了is_training为1，但由于train_epochs为0，所以仍然没训～
                 "--model", "VisionTS",
-                "--root_path", "./datasets/",
+                # "--root_path", "./datasets/",
+                "--root_path", "~/VisionTSpp/datasets/",
                 "--data_path", f"{ds}.csv",
                 "--save_dir", f"./save/{ds}_{pred_len}",
                 "--model_id", f"VisionTS_{ds}_{pred_len}_{line}",
@@ -237,4 +241,5 @@ for line in lines[st:ed]:
             ]
             print(cmd)
 
-            subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_ltsf")
+            # subprocess.run(cmd, cwd="/home/mouxiangchen/uni2ts/scripts/VisionTS/eval_ltsf")
+            subprocess.run(cmd, cwd="/home/lefeishen/VisionTSpp/scripts/VisionTS/eval_ltsf")

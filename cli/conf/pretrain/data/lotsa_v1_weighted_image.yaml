@@ -9,7 +9,8 @@ image_sampling_prob: 0.0
 num_patches: 14
 num_patches_input: 7
 image_size: 224
-# 原来moirai的设置
+
+# original moirai's settings
 ts_builder:
   _target_: uni2ts.data.builder.ConcatDatasetBuilder
   _args_:

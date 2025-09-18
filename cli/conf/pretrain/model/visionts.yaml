@@ -52,5 +52,5 @@ clip_input: 1
 complete_no_clip: false
 
 # adapt_all_params controls whether to adapt all parameters or only the last layer.
-# adapt_all_params: true
-adapt_all_params: false
+adapt_all_params: true
+# adapt_all_params: false

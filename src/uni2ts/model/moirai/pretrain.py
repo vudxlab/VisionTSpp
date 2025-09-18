@@ -164,7 +164,7 @@ class MoiraiPretrain(L.LightningModule):
         print(f"type of clip_input? (0: no clip, 1: simple clip, 2: clip_new) : {self.hparams.clip_input}")
         print(f"Is using complete_no_clip? : {self.hparams.complete_no_clip}")
         
-        # 打印一些超参数信息：
+        # Hyper-parameters
         print("output_dist:", self.hparams.output_dist)
         print("pixel_loss_weight:", self.hparams.pixel_loss_weight)
         print("pixel_loss_type:", self.hparams.pixel_loss_type)
@@ -183,7 +183,8 @@ class MoiraiPretrain(L.LightningModule):
                 checkpoint = torch.load(os.path.join(env.VISIONTS_CHECKPOINT_PATH, "mae_visualize_vit_huge.pth"), map_location='cpu')
             
             load_result = self.module.load_state_dict(checkpoint['model'], strict=False)
-            print(f"load ckpt: {load_result}")
+            print(f"Load ckpt: {load_result}")
+            
         else:
             print("We did not load MAE ckpt!!!")
         
@@ -219,7 +220,7 @@ class MoiraiPretrain(L.LightningModule):
         cur_image = cur_image.cpu()
         
         height_per_var = image.shape[0] // cur_nvars
-        print(f"{height_per_var = }, {image.shape = }, {cur_nvars = }")
+        # print(f"{height_per_var = }, {image.shape = }, {cur_nvars = }")
         for i in range(cur_nvars):
             cur_color = cur_color_list[i]
             cur_image[i*height_per_var:(i+1)*height_per_var, :, cur_color] = \
@@ -258,9 +259,9 @@ class MoiraiPretrain(L.LightningModule):
             plt.fill_between(torch.arange(len(y)) + len(x), (y_pred - y_pred_std).cpu(), (y_pred + y_pred_std).cpu(), color='C1', alpha=0.2)
         
         if y_pred_quantile_list is not None:
-            print(f"{len(y_pred_quantile_list) = }")
+            # print(f"{len(y_pred_quantile_list) = }")
             for j, y_pred_quantile in enumerate(y_pred_quantile_list):
-                print(f"y_pred_quantile_list[{j}].shape: {y_pred_quantile.shape}")
+                # print(f"y_pred_quantile_list[{j}].shape: {y_pred_quantile.shape}")
                 if j < len(y_pred_quantile_list) // 2:
                     plt.plot(torch.arange(len(y)) + len(x), y_pred_quantile.cpu(), label=f'pred_{10*(j+1)}', color=f'C{j+2}', alpha=0.5)
                 else:
@@ -508,8 +509,8 @@ class MoiraiPretrain(L.LightningModule):
         
         if self.hparams.clip_input == 0:
             if self.hparams.complete_no_clip:
-                print(f"target > 5: {torch.any((target > 5))}, target < -5: {torch.any((target < -5))}")
-                # pass
+                # print(f"target > 5: {torch.any((target > 5))}, target < -5: {torch.any((target < -5))}")
+                pass
             else:
                 y = torch.clip(y, -5, 5)
                 x = torch.clip(x, -5, 5)
@@ -518,7 +519,7 @@ class MoiraiPretrain(L.LightningModule):
         elif self.hparams.clip_input == 1:
             thres_down = -1.8044
             thres_up = 2.2489
-            print(f"target > {thres_up}: {torch.any((target > thres_up))}, target < {thres_down}: {torch.any((target < thres_down))}")
+            # print(f"target > {thres_up}: {torch.any((target > thres_up))}, target < {thres_down}: {torch.any((target < thres_down))}")
             
             y = torch.clip(y, thres_down, thres_up)
             x = torch.clip(x, thres_down, thres_up)
@@ -974,8 +975,7 @@ class MoiraiPretrain(L.LightningModule):
 
 
         # ! validate that we considered every parameter
-        # ! 250507 adds: 所以现在是包含了所有的模型参数？
-        # ! 250511 adds: 我们使用adapt_all_params来控制训练全部参数/只训练LN层？
+        # ! "adapt_all_params" is to control whether to adapt all parameters or only LN layers.
         if self.hparams.adapt_all_params:
             param_dict = {pn: p for pn, p in self.named_parameters() if p.requires_grad}
         else:
