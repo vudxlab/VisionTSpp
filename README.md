@@ -44,7 +44,7 @@ Experience the powerful forecasting capabilities of **VisionTS++** instantly —
 Want to test it on your own data? Just upload a custom time series CSV file, and VisionTS++ will perform **zero-shot forecasting** out of the box.
 
 <div align="center">
-<img src="figures/visiontspp_hf_space_ettm1.png" style="width:95%;" />
+<img src="figures/visiontspp_hf_space_ettm1.png" style="width:100%;" />
 </div>
 
 ## 🔍 About
