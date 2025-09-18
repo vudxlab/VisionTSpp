@@ -47,7 +47,6 @@ Want to test it on your own data? Just upload a custom time series CSV file, and
 <img src="figures/visiontspp_hf_space_ettm1.png" style="width:95%;" />
 </div>
 
-
 ## 🔍 About
 
 + In this work, we propose a new time series foundation model, VisionTS++, a SOTA time series foundation model by continual pre-training visual MAE on large-scale time series data, supporting multi-variate forecasting and probablistic forecasting!
