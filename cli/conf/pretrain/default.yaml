@@ -42,8 +42,7 @@ trainer:
       every_n_epochs: 100 # ${floordiv:${trainer.max_epochs},10}
   # epoch-based training provides averaged metrics
   # cannot use max_steps with epoch-based training - resume from checkpoint on wrong epoch
-  # max_epochs: 1_000
-  max_epochs: 3_000
+  max_epochs: 1_000
   enable_progress_bar: true
   accumulate_grad_batches: 1
   # accumulate_grad_batches: 2
