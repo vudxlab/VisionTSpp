@@ -9,6 +9,7 @@
 [![VisionTS_Paper](https://img.shields.io/badge/VisionTS_Paper-2408.17253-red)](https://arxiv.org/abs/2408.17253)
 [![PyPI - Version](https://img.shields.io/pypi/v/visionts)](#-quick-start)
 [![huggingface](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-FFD21E)](https://huggingface.co/Lefei/VisionTSpp)
+[![时序人](https://img.shields.io/badge/%E6%97%B6%E5%BA%8F%E4%BA%BA-black?logo=wechat&logoColor=white)](https://mp.weixin.qq.com/s/bbR8dfQYO1lawqN-yKAIJA)
 
 </div>
 
@@ -24,6 +25,7 @@
   - [💻 Continual Pre-training](#-continual-pre-training)
   - [🔗 Citing VisionTS++](#-citing-visionts)
   - [❤️ Acknowledgement](#️-acknowledgement)
+  - [⭐ Star History](#-star-history)
 
 </details>
 
@@ -185,3 +187,8 @@ We deeply appreciate the following github repos for their valuable code base or 
 + Moirai [[repo]](https://github.com/SalesforceAIResearch/uni2ts)
 + Time-Series-Library [[repo]](https://github.com/thuml/Time-Series-Library)
 + GluonTS [[repo]](https://github.com/awslabs/gluonts)
+
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=HALF111/VisionTSpp&type=Timeline)](https://www.star-history.com/#HALF111/VisionTSpp&Timeline)

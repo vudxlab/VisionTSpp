@@ -267,15 +267,16 @@ for line in lines[st:ed]:
             if ds == "ETTm1" or ds == "ETTm2":
                 if pred_len == 96:
                     if not ('epoch=299' in line or 'epoch=599' in line or 'epoch=999' in line
-                            or 'epoch=1299' in line or 'epoch=1599' in line or 'epoch=1999' in line): 
+                            or 'epoch=1299' in line or 'epoch=1599' in line or 'epoch=1999' in line
+                            or 'epoch=2299' in line or 'epoch=2599' in line or 'epoch=2999' in line):
                         continue
                 else:
-                    if not ('epoch=999' in line or 'epoch=1999' in line): 
+                    if not ('epoch=999' in line or 'epoch=1999' in line or 'epoch=2999' in line): 
                         continue
             
             if ds == "Electricity" or ds == "Weather":
                 # if not 'epoch=999' in line: 
-                if not ('epoch=999' in line or 'epoch=1999' in line):
+                if not ('epoch=999' in line or 'epoch=1999' in line or 'epoch=2999' in line):
                     continue
 
             
