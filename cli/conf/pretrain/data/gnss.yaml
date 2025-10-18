@@ -1,0 +1,6 @@
+_target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
+dataset: GNSS
+weight: 1.0
+sample_time_series:
+  _target_: uni2ts.data.dataset.SampleTimeSeriesType
+  _args_: ["none"]

@@ -9,6 +9,7 @@ max_pre_mask_ratio: 0.5
 pre_mask_prob: 0.05
 num_patch_input: 7
 norm_const: 0.4
+task_mode: forecast
 
 # max_dim controls the maximum number of variables to be sampled.
 # max_dim: 128

@@ -1,18 +1,12 @@
-import torch
-
 import os
-
-from . import models_mae
+import numpy as np
+import torch
 import einops
 import torch.nn.functional as F
-from torch import nn
 from PIL import Image
-import numpy as np
-from . import util
-import sys
-sys.path.append("/home/mouxiangchen/VisionTS/visionts")
-from omegaconf import OmegaConf
-import yaml
+from torch import nn
+
+from . import models_mae, util
 
 MAE_ARCH = {
     # "mae_base": [models_mae.mae_test, "mae_visualize_vit_base.pth"],
@@ -24,7 +18,6 @@ MAE_ARCH = {
 MAE_DOWNLOAD_URL = "https://dl.fbaipublicfiles.com/mae/visualize/"
 
 class VisionTS(nn.Module):
-
     def __init__(self, arch='mae_base', finetune_type='ln', ckpt_dir='./ckpt/', load_ckpt=True):
         super(VisionTS, self).__init__()
 
@@ -165,6 +158,7 @@ class VisionTS(nn.Module):
             
             image_reconstructed = einops.rearrange(image_reconstructed, '(b n) c h w -> b n h w c', b=x_enc.shape[0])
             # return y, image_input, image_reconstructed
+            return y, image_input, image_reconstructed
         
         # # ======================================================
         # imagenet_mean = torch.Tensor([0.485, 0.456, 0.406]).to(image_input)

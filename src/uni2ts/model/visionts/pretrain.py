@@ -106,6 +106,7 @@ class VisionTSPretrain(L.LightningModule):
         load_ckpt: bool = True,
         max_pre_mask_ratio: float = 0.5,
         pre_mask_prob: float = 0.1,
+        task_mode: str = "forecast",
     ):
         assert (
             num_warmup_steps <= num_training_steps
@@ -127,6 +128,7 @@ class VisionTSPretrain(L.LightningModule):
         self.mask_ratio = torch.mean(mask).item()
         self.log_image_step = log_image_step
         self.register_buffer("mask", mask.float().reshape((1, -1)))
+        self.task_mode = task_mode
 
 
     def show_image(self, image, title=''):
@@ -491,18 +493,30 @@ class VisionTSPretrain(L.LightningModule):
                     max_pred_ratio=self.hparams.max_mask_ratio,
                     max_pre_mask_ratio=self.hparams.max_pre_mask_ratio,
                     pre_mask_prob=self.hparams.pre_mask_prob,
+                    task=self.task_mode,
                     fields=("target",)
                 )
-                + SelectFields(fields=[
-                    "target",
-                    "y",
-                    "x",
-                    "pad_left",
-                    "context_len",
-                    "pred_len",
-                    "periodicity",
-                    "scale_x"
-                ])
+                + SelectFields(
+                    fields=[
+                        "target",
+                        "y",
+                        "x",
+                        "pad_left",
+                        "context_len",
+                        "pred_len",
+                        "periodicity",
+                        "scale_x",
+                    ]
+                    + (
+                        [
+                            "impute_context_start",
+                            "impute_missing_start",
+                            "impute_missing_length",
+                        ]
+                        if self.task_mode == "impute"
+                        else []
+                    )
+                )
             )
 
         return defaultdict(lambda: default_train_transform)

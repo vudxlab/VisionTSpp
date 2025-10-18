@@ -56,7 +56,7 @@ class FixedPatchSizeConstraints(PatchSizeConstraints):
         assert self.start <= self.stop
 
     def _get_boundaries(self, n: int, offset_name: str) -> tuple[int, int]:
-        # ! 250424 adds: 这里则就是固定stop和start一样？，并且patch大小都设置为1？
+        # ! 250424 bổ sung: cấu hình này cố định stop và start giống nhau, tức là kích thước patch duy nhất
         return self.start, self.stop
 
 
@@ -76,7 +76,7 @@ class DefaultPatchSizeConstraints(PatchSizeConstraints):
     }
 
     def _get_boundaries(self, n: int, offset_name: str) -> tuple[int, int]:
-        # ! 250424 adds: 原本是对不同时间分辨率的数据，设置不同的patch size范围。
+        # ! 250424 bổ sung: đặt khoảng kích thước patch khác nhau tùy theo độ phân giải thời gian
         start, stop = self.DEFAULT_RANGES[offset_name]
         return start, stop
 
@@ -156,8 +156,8 @@ class Patchify(MapFuncMixin, Transformation):
         return self._patchify_arr(arr, patch_size)
 
     def _patchify_arr(
-        self, arr: Num[np.ndarray, "var time*patch"], patch_size: int
-    ) -> Num[np.ndarray, "var time max_patch"]:
+        self, arr: np.ndarray, patch_size: int
+    ) -> np.ndarray:
         assert arr.shape[-1] % patch_size == 0
         arr = rearrange(arr, "... (time patch) -> ... time patch", patch=patch_size)
         pad_width = [(0, 0) for _ in range(arr.ndim)]
@@ -166,9 +166,9 @@ class Patchify(MapFuncMixin, Transformation):
         return arr
 
 def FFT_for_Period(x, k=5):
-    # [T, ]
+    # Dạng [T, ]
     xf = np.fft.rfft(x)
-    # find period by amplitudes
+    # tìm chu kỳ dựa trên biên độ phổ
     frequency_list = abs(xf)
     frequency_list[0] = 0
     top_list = np.argsort(frequency_list)[-k:]
@@ -188,6 +188,7 @@ class ImagifyTS(ApplyFuncMixin, Transformation):
     max_pred_ratio: float
     max_pre_mask_ratio: float
     pre_mask_prob: float
+    task: str = "forecast"
     fields: tuple[str, ...] = ("target",)
 
     def __call__(self, data_entry: dict[str, Any]) -> dict[str, Any]:
@@ -210,20 +211,52 @@ class ImagifyTS(ApplyFuncMixin, Transformation):
         # energy = [(p, fft[len(data) // p]) for p in periods]
         # print(energy, no_period_prob)
         
-        # ! data_entry[field].shape = [nvars, total_len]
+        # ! data_entry[field] có dạng [nvars, total_len]
 
-        # setup
+        # Khởi tạo
         periodicity_list = [x for x in freq_to_seasonality_list(freq) if x * 2 < len(data_entry[field][0])]
-        periodicity = random.choice(periodicity_list)  # 随机从所有freq里选一个？
-        
-        data = data_entry[field][0]
-        pred_len = int(len(data) * (random.random() * (self.max_pred_ratio - self.min_pred_ratio) + self.min_pred_ratio))  # max=0.5, min=0.15
-        context_len = len(data) - pred_len
+        periodicity = random.choice(periodicity_list)  # Chọn ngẫu nhiên một chu kỳ từ danh sách tần suất
 
-        if context_len > periodicity * self.num_patch_input * self.patch_size:
-            data = data[:periodicity * self.num_patch_input * self.patch_size]  # num_patch_input=7, patch_size=16, 如果原来样本的context超过112个周期的长度，则只截取出最后112个周期的数据了！！
-            pred_len = int(len(data) * (random.random() * (self.max_pred_ratio - self.min_pred_ratio) + self.min_pred_ratio))  # 
-            context_len = len(data) - pred_len  # 重新计算context和pred len。
+        full_series = data_entry[field][0]
+        total_len = len(full_series)
+        if total_len <= 1:
+            raise ValueError("Time series is too short to create an imputation task.")
+
+        ratio = random.random() * (self.max_pred_ratio - self.min_pred_ratio) + self.min_pred_ratio
+        pred_len = max(1, int(total_len * ratio))
+        pred_len = min(pred_len, total_len - 1)
+
+        max_kernel = periodicity * self.num_patch_input * self.patch_size
+
+        if getattr(self, "task", "forecast") == "impute":
+            max_start = total_len - pred_len
+            min_start = min(max_start - 1, max(periodicity, self.patch_size))
+            if min_start < 1:
+                min_start = 1
+            if max_start <= min_start:
+                missing_start = max_start
+            else:
+                missing_start = random.randint(min_start, max_start)
+
+            context_end = missing_start
+            context_start = max(0, context_end - max_kernel)
+            context_len = context_end - context_start
+            if context_len <= 0:
+                raise ValueError("Failed to sample a valid context window for imputation.")
+
+            data = full_series[context_start : missing_start + pred_len]
+            data_entry["impute_context_start"] = context_start
+            data_entry["impute_missing_start"] = missing_start
+            data_entry["impute_missing_length"] = pred_len
+        else:
+            data = full_series
+            context_len = total_len - pred_len
+            if context_len > max_kernel:
+                context_start = context_len - max_kernel
+                context_len = max_kernel
+                data = full_series[context_start : context_start + context_len + pred_len]
+            else:
+                data = full_series[: context_len + pred_len]
 
         x = torch.Tensor(data[:context_len]).reshape((1, -1, 1))
         y = torch.Tensor(data[context_len:]).reshape((1, -1, 1))
@@ -234,50 +267,56 @@ class ImagifyTS(ApplyFuncMixin, Transformation):
         pad_left = 0
         pad_right = 0
         if context_len % periodicity != 0:
-            pad_left = periodicity - context_len % periodicity  # 如果不是周期整数倍，需要对左右边做padding！
+            pad_left = periodicity - context_len % periodicity  # Nếu không chia hết theo chu kỳ thì cần đệm thêm ở hai đầu
         if pred_len % periodicity != 0:
             pad_right = periodicity - pred_len % periodicity
 
-        # 因为context_len的周期数要对应到112个像素点里，该值表示横向上“一个像素点里需要放几个周期的时序数据”？例如假设context_len一共8个周期，则scale_x = 8/112 = 1/14 = 0.0714
+        # Vì số chu kỳ trong context_len phải được ánh xạ vào 112 điểm ảnh, giá trị này biểu diễn số chu kỳ nằm trong một điểm ảnh theo chiều ngang.
+        # Ví dụ context_len có 8 chu kỳ thì scale_x = 8/112 = 1/14 = 0,0714.
         scale_x = ((pad_left + context_len) // periodicity) / (int(self.image_size * adjust_input_ratio))
         # output_resize = safe_resize((periodicity, int(round(image_size * scale_x))), interpolation=interpolation)
 
-        # 1. Normalization
-        means = x.mean(1, keepdim=True).detach() # x: [bs x 1 x nvars], means: [1 x 1 x 1]
+        # 1. Chuẩn hóa
+        means = x.mean(1, keepdim=True).detach()  # x: [bs x 1 x nvars], means: [1 x 1 x 1]
         x_enc = x - means
         stdev = torch.sqrt(
-            torch.var(x_enc.to(torch.float64), dim=1, keepdim=True, unbiased=False) + 1e-5) # [bs x 1 x nvars]
-        # ! norm_const: 一般设置为0.4，用于约束增大标准差stdev，使得norm之后的值的范围更小！
+            torch.var(x_enc.to(torch.float64), dim=1, keepdim=True, unbiased=False) + 1e-5
+        )  # [bs x 1 x nvars]
+        # ! norm_const: thường đặt 0.4 để hạn chế việc phóng đại độ lệch chuẩn, giúp giá trị sau chuẩn hóa nằm trong phạm vi hẹp hơn
         stdev /= self.norm_const
         x_enc /= stdev
-        # Channel Independent
-        x_enc = rearrange(x_enc, 'b s n -> b n s') # x_enc: [bs x nvars x seq_len]
+        # Kênh độc lập
+        x_enc = rearrange(x_enc, 'b s n -> b n s')  # x_enc: [bs x nvars x seq_len]
 
-        # TODO: 这句code的目的是？
+        # TODO: mục đích cụ thể của đoạn mã này là gì?
         lookback_masked = False
         if random.random() < self.pre_mask_prob:  # self.pre_mask_prob = 0.05
-            # self.max_pre_mask_ratio = 0.5 -> 有0.05的概率输入一个左半边全为0的图片？
-            # ! 250410 adds: 这里额外增加一个random.random()，减少mask过长的input？
+            # self.max_pre_mask_ratio = 0.5 -> có 5% xác suất phần phía trái của ảnh bị che toàn bộ bằng 0
+            # ! 250410 bổ sung: nhân thêm random.random() để giảm nguy cơ mặt nạ quá dài
             mask_len = int(len(data) * self.max_pre_mask_ratio) * random.random()
             x_enc[:, :, :int(len(data) * self.max_pre_mask_ratio)] = 0
             lookback_masked = True
 
-        # 2. Segmentation
-        x_pad = F.pad(x_enc, (pad_left, 0), mode='constant') # [batch, nvars, seq_len]
-        x_2d = rearrange(x_pad, 'b n (p f) -> (b n) 1 f p', f=periodicity)  # f指的就是周期！！
+        # 2. Phân đoạn
+        x_pad = F.pad(x_enc, (pad_left, 0), mode='constant')  # [batch, nvars, seq_len]
+        x_2d = rearrange(x_pad, 'b n (p f) -> (b n) 1 f p', f=periodicity)  # f chính là chu kỳ
 
-        # 3. Render & Alignment
-        x_resize = input_resize(x_2d)  # 把[周期长度，周期数]的数据resize到[224, 112]，正好为图片的左半边。（ps：右半边为mask！！）
-        masked = torch.zeros((x_2d.shape[0], 1, self.image_size, num_patch_output * self.patch_size), device=x_2d.device, dtype=x_2d.dtype)  # [bs, 1, 224, 112]，右半边的mask
+        # 3. Dựng ảnh & Căn chỉnh
+        x_resize = input_resize(x_2d)  # Co dãn dữ liệu [độ dài chu kỳ, số chu kỳ] về [224, 112] cho nửa trái của ảnh
+        masked = torch.zeros(
+            (x_2d.shape[0], 1, self.image_size, num_patch_output * self.patch_size),
+            device=x_2d.device,
+            dtype=x_2d.dtype,
+        )  # [bs, 1, 224, 112], nửa phải là vùng mặt nạ
         x_concat_with_masked = torch.cat([
             x_resize, 
             masked
-        ], dim=-1)  # concat起来！
-        image_input = repeat(x_concat_with_masked, 'b 1 h w -> b c h w', c=3)  # copy 3个channels
+        ], dim=-1)  # Ghép hai nửa ảnh lại với nhau
+        image_input = repeat(x_concat_with_masked, 'b 1 h w -> b c h w', c=3)  # Sao chép thành 3 kênh màu
 
-        # output
-        # 这里对x和y也做了norm！！
-        y = (y - means) / stdev # [1, Pred_len, 1]
+        # Đầu ra
+        # x và y cũng được chuẩn hóa
+        y = (y - means) / stdev  # [1, Pred_len, 1]
         x = (x - means) / stdev # [1, Seq_len, 1]
         
         # Pixel loss
@@ -287,12 +326,12 @@ class ImagifyTS(ApplyFuncMixin, Transformation):
             y_true = F.pad(y_true, (0, pad_right), mode='replicate') # [1, Pred_len]
             y_mask = F.pad(y_mask, (0, pad_right), mode='constant')
         y_true_with_mask = torch.cat([y_true, y_mask], dim=0) # [2, Pred_len]
-        y_true_2d = rearrange(y_true_with_mask, 'b (p f) -> b 1 f p', f=periodicity)  # y_true_2d: [b, 1, 周期长度, 周期数] 第一维为真实的y值，第二维为y_mask，1表示该位置是有值的（对应真实标签值），0表示无值（即就是空着的）
-        target_width = int(round(y_true_2d.shape[3] / float(scale_x)))  # 预测窗口的pred_len对应的像素点个数，如19 / 0.83 = 23
-        padding_width = num_patch_output * self.patch_size - target_width  # 因为mask部分横向一共有112个像素点，剩余的112-23=89个像素点都当作padding处理了！
-        y_true_2d = safe_resize((self.image_size, target_width), interpolation=Image.BILINEAR)(y_true_2d) # 插值到：[2, 1, Image_Size=224, Target_Width=112]
-        y_true_2d = F.pad(y_true_2d, (0, padding_width), mode='constant') # y_true_2d右边没有值的部分用0填充，shape为[2, 1, Image_Size=224, Mask_Size=112]
-        y_true_2d = rearrange(y_true_2d, 'b 1 h w -> b h w') # [2, Image_Size=224, Mask_Size=112]
+        y_true_2d = rearrange(y_true_with_mask, 'b (p f) -> b 1 f p', f=periodicity)  # y_true_2d: [b, 1, độ dài chu kỳ, số chu kỳ], hàng đầu là giá trị thật, hàng thứ hai là mặt nạ (1: có nhãn, 0: trống)
+        target_width = int(round(y_true_2d.shape[3] / float(scale_x)))  # Số điểm ảnh tương ứng với pred_len trong cửa sổ dự báo, ví dụ 19 / 0.83 ≈ 23
+        padding_width = num_patch_output * self.patch_size - target_width  # Phần mặt nạ có 112 điểm ảnh ngang, còn lại 112-23=89 điểm ảnh sẽ được đệm
+        y_true_2d = safe_resize((self.image_size, target_width), interpolation=Image.BILINEAR)(y_true_2d)  # Nội suy thành [2, 1, 224, target_width]
+        y_true_2d = F.pad(y_true_2d, (0, padding_width), mode='constant')  # Điền 0 cho phần bên phải không có giá trị, thu được [2, 1, 224, 112]
+        y_true_2d = rearrange(y_true_2d, 'b 1 h w -> b h w')  # [2, 224, 112]
 
         data_entry[field] = image_input.float().numpy()[0]
         data_entry[field + "_img"] = y_true_2d.float().numpy()
@@ -305,7 +344,7 @@ class ImagifyTS(ApplyFuncMixin, Transformation):
         data_entry['scale_x'] = float(scale_x)
         # data_entry['mask'] = float(scale_x)
         
-        # ! 250410 adds: 
+        # ! 250410 bổ sung:
         # assert means.shape == (1, 1, 1)
         # assert stdev.shape == (1, 1, 1)
         data_entry['means'] = float(means.cpu().numpy()[0][0])
@@ -359,9 +398,9 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         return data_entry
 
     def _imagify(self, data_entry: dict[str, Any], field: str, freq: str):
-        # setup
-        periodicity_list = [x for x in freq_to_seasonality_list(freq) if x * 2 < len(data_entry[field][0])]  # 这样保证数据里至少有两个完整周期？
-        periodicity = random.choice(periodicity_list)  # 随机从所有freq里选一个？
+        # Thiết lập ban đầu
+        periodicity_list = [x for x in freq_to_seasonality_list(freq) if x * 2 < len(data_entry[field][0])]  # Đảm bảo dữ liệu có ít nhất hai chu kỳ đầy đủ
+        periodicity = random.choice(periodicity_list)  # Chọn ngẫu nhiên một chu kỳ từ danh sách tần suất
         
         data = data_entry[field]  # shape: [nvars, total_len]
         nvars, total_len = data.shape
@@ -369,9 +408,9 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         context_len = len(data[0]) - pred_len
 
         if context_len > periodicity * self.num_patch_input * self.patch_size:  # period * 7 * 16
-            data = data[:, :periodicity * self.num_patch_input * self.patch_size]  # num_patch_input=7, patch_size=16, 如果原来样本的context超过112个周期的长度，则只截取出最后112个周期的数据了！！
-            pred_len = int(len(data[0]) * (random.random() * (self.max_pred_ratio - self.min_pred_ratio) + self.min_pred_ratio))  # 
-            context_len = len(data[0]) - pred_len  # 重新计算context和pred len。
+            data = data[:, :periodicity * self.num_patch_input * self.patch_size]  # Nếu context vượt quá 112 đoạn chu kỳ thì chỉ giữ lại phần cuối cùng
+            pred_len = int(len(data[0]) * (random.random() * (self.max_pred_ratio - self.min_pred_ratio) + self.min_pred_ratio))
+            context_len = len(data[0]) - pred_len  # Tính lại độ dài context và pred_len
 
         # x = torch.Tensor(data[:, :context_len]).reshape((1, -1, nvars))  # [bs, seq_len, nvars]
         # y = torch.Tensor(data[:, context_len:]).reshape((1, -1, nvars))  # [bs, pred_len, nvars]
@@ -383,9 +422,9 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         num_patch_output = num_patch - self.num_patch_input  # 14 - 7 = 7
         adjust_input_ratio = self.num_patch_input / num_patch  # 7 / 14 = 0.5
         
-        # safe_resize返回的是：Resize(size = [224, 112], interpolation = "Bilinear", antialias=False)
-        # ! 250426 adds: 这里的image_size_per_var是224/nvars，表示每个变量对应224/nvars个像素点。
-        # ! 考虑无法整除的情况，可能会在后面做pad_down！
+        # safe_resize trả về: Resize(size = [224, 112], interpolation = "Bilinear", antialias=False)
+        # ! 250426 bổ sung: image_size_per_var = 224/nvars, nghĩa là mỗi biến chiếm 224/nvars điểm ảnh theo chiều dọc.
+        # ! Nếu không chia hết, phần thiếu sẽ được bù vào cuối ảnh (pad_down).
         image_size_per_var = int(self.image_size / nvars)  # 224 // nvars
         input_resize = safe_resize((image_size_per_var, int(self.image_size * adjust_input_ratio)), interpolation=Image.BILINEAR)
         
@@ -393,57 +432,54 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         pad_right = 0
         
         if context_len % periodicity != 0:
-            pad_left = periodicity - context_len % periodicity  # 如果不是周期整数倍，需要对左右边做padding！
+            pad_left = periodicity - context_len % periodicity  # Nếu không chia hết cho chu kỳ thì đệm thêm ở phía trái
         if pred_len % periodicity != 0:
             pad_right = periodicity - pred_len % periodicity
 
-        # 因为context_len的周期数要对应到112个像素点里，因此scale_x表示横向上“一个像素点里需要放几个周期的时序数据”？
-        # 例如假设context_len一共8个周期，则scale_x = 8/112 = 1/14 = 0.0714
+        # Vì số chu kỳ trong context_len phải ánh xạ vào 112 điểm ảnh, scale_x biểu diễn số chu kỳ cho mỗi điểm ảnh theo chiều ngang.
+        # Ví dụ context_len gồm 8 chu kỳ thì scale_x = 8/112 = 1/14 ≈ 0,0714.
         scale_x = ((pad_left + context_len) // periodicity) / (int(self.image_size * adjust_input_ratio))
-        
+
         # output_resize = safe_resize((periodicity, int(round(image_size * scale_x))), interpolation=interpolation)
 
-        # 1. Normalization
+        # 1. Chuẩn hóa
         means = x.mean(1, keepdim=True).detach()  # x: [bs x seq_len x nvars], means: [bs x 1 x nvars]
         x_enc = x - means
         stdev = torch.sqrt(
             torch.var(x_enc.to(torch.float64), dim=1, keepdim=True, unbiased=False) + 1e-5)  # [bs x 1 x nvars]
-        # ! norm_const: 一般设置为0.4，用于约束增大标准差stdev，使得norm之后的值的范围更小！
+        # ! norm_const thường đặt 0.4 để giới hạn độ lệch chuẩn nhằm thu hẹp biên độ sau chuẩn hóa
         stdev /= self.norm_const
         x_enc /= stdev
-        # Channel Independent
+        # Kênh độc lập
         x_enc = rearrange(x_enc, 'b s n -> b n s')  # x_enc: [bs x nvars x seq_len]
 
-        # TODO: 这句code的目的是？
-        # ! 250425 adds: 这里是为了以0.05的概率令seq_len的左侧有一部分为0，
-        # ! 从而让pred_len比seq_len长的情况也能被训练到！
+        # TODO: mục đích cụ thể của đoạn mã này là gì?
+        # ! 250425 bổ sung: mục tiêu là tạo ra 5% xác suất chuỗi bị che bên trái để mô phỏng trường hợp pred_len dài hơn seq_len.
         lookback_masked = False
         if random.random() < self.pre_mask_prob:  # self.pre_mask_prob = 0.05
-            # self.max_pre_mask_ratio = 0.5 -> 有0.05的概率输入一个左半边全为0的图片？
-            # ! 250410 adds: 这里额外增加一个random.random()，减少mask过长的input？
+            # self.max_pre_mask_ratio = 0.5 -> có 5% xác suất nửa bên trái ảnh được đặt toàn số 0
+            # ! 250410 bổ sung: nhân thêm random.random() để giảm khả năng phần mặt nạ quá dài
             mask_len = int(len(data[0]) * self.max_pre_mask_ratio * random.random())
             # x_enc[:, :, :int(len(data[0]) * self.max_pre_mask_ratio)] = 0
             x_enc[:, :, :mask_len] = 0
             lookback_masked = True
 
-        # 2. Segmentation
-        # PS: 当pad有两个参数，代表对最后一个维度扩充，pad = (左边填充数=pad_left，右边填充数=0)
-        x_pad = F.pad(x_enc, (pad_left, 0), mode='constant') # [bs, nvars, seq_len]
-        
-        # ! f指的就是周期！然后p是周期个数？
-        # ! -> 注意这里前面是(p f)，后面是f p，是因为前面是横向从前到后顺序的数据，而转换好的图像为纵向从上到下顺序，所以要调换一下！！
-        # x_2d = rearrange(x_pad, 'b n (p f) -> (b n) 1 f p', f=periodicity)
-        # ! 250424 adds: x_2d.shape = [bs, 1, nvars * periodicity, 周期数p]
-        # x_2d = rearrange(x_pad, 'b n (p f) -> b 1 (n f) p', f=periodicity)
-        x_2d = rearrange(x_pad, 'b n (p f) -> b n f p', f=periodicity)  # x_2d.shape: [bs, nvars, 周期长度f, 周期数p]
+        # 2. Phân đoạn
+        # Ghi chú: khi pad có hai tham số, nghĩa là bổ sung ở chiều cuối cùng: pad = (đệm bên trái = pad_left, đệm bên phải = 0)
+        x_pad = F.pad(x_enc, (pad_left, 0), mode='constant')  # [bs, nvars, seq_len]
 
-        # 3. Render & Alignment
-        # ! 这里把[周期长度f，周期数p]的数据resize到[224, 112]，正好为图片的左半边。（ps：右半边为mask！！）
-        x_resize = input_resize(x_2d)  # x_resize.shape: [b, nvars, 224//nvars, p->112]
+        # ! f chính là chu kỳ, p là số chu kỳ
+        # ! Lưu ý: biểu thức trước là (p f) còn sau là f p vì ban đầu dữ liệu theo thứ tự ngang, khi đổi sang ảnh thì phải đảo lại theo chiều dọc.
+        # ! 250424 bổ sung: x_2d.shape = [bs, nvars, periodicity, số chu kỳ p]
+        x_2d = rearrange(x_pad, 'b n (p f) -> b n f p', f=periodicity)  # x_2d.shape: [bs, nvars, độ dài chu kỳ f, số chu kỳ p]
+
+        # 3. Dựng ảnh & Căn chỉnh
+        # ! Dữ liệu [độ dài chu kỳ f, số chu kỳ p] được co dãn về [224, 112] để tạo nửa trái của ảnh (nửa phải sẽ là mặt nạ)
+        x_resize = input_resize(x_2d)  # x_resize.shape: [bs, nvars, 224//nvars, ~112]
         x_resize = rearrange(x_resize, 'b n h w -> b 1 (n h) w')  # x_resize.shape: [bs, 1, nvars*224//nvars, 112]
-        # 由于nvars不一定完全被224整除，所以可能存在pad_down
+        # Vì nvars có thể không chia hết cho 224 nên cuối ảnh có thể cần đệm thêm (pad_down)
         pad_down = self.image_size - x_resize.shape[2]  # 224 - nvars*224//nvars
-        
+
         if pad_down > 0:
             # x_resize = F.pad(x_resize, (0, 0, 0, pad_down), mode='constant')
             x_resize = torch.concat([
@@ -453,21 +489,21 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
                 ], 
                 dim=2)  # [bs, 1, 224, 112]
         assert x_resize.shape[2] == self.image_size, f"image size mismatch: {x_resize.shape[2]} vs {self.image_size}"
-        
-        
-        # masked: [bs, 1, 224, 112]，右半边的mask
+
+
+        # masked: [bs, 1, 224, 112], nửa bên phải là vùng mặt nạ
         masked = torch.zeros((x_2d.shape[0], 1, self.image_size, num_patch_output * self.patch_size), device=x_2d.device, dtype=x_2d.dtype)
         x_concat_with_masked = torch.cat([
             x_resize, 
             masked
-        ], dim=-1)  # concat起来！最后一维：112+112=224，也即x_concat_with_masked.shape = [bs, 1, 224, 224]
+        ], dim=-1)  # Ghép thành [bs, 1, 224, 224] (112 điểm ảnh gốc + 112 điểm ảnh mặt nạ)
         
-        # TODO: 250426 adds: 这里可以根据颜色区分nvars！！
+        # TODO: 250426 bổ sung: có thể dùng màu để phân biệt từng biến
         
-        # # ! solution 1: 不加颜色，直接repeat三份
-        # image_input = repeat(x_concat_with_masked, 'b 1 h w -> b c h w', c=3)  # copy 3个channels
+        # # ! Phương án 1: không tô màu, chỉ lặp lại 3 lần
+        # image_input = repeat(x_concat_with_masked, 'b 1 h w -> b c h w', c=3)  # Sao chép thành 3 kênh
         
-        # ! solution 2: 随机对每个var使用不同颜色！
+        # ! Phương án 2: gán màu ngẫu nhiên cho từng biến
         # color_dict = {0: [0,0,0], 1: [0,0,1]}
         image_input = torch.zeros((x_concat_with_masked.shape[0], 3, x_concat_with_masked.shape[2], x_concat_with_masked.shape[3]), 
                                   device=x_concat_with_masked.device, 
@@ -475,25 +511,25 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         color_list = []
         for i in range(nvars):
             if i == 0: 
-                color = random.randint(0, 2)  # random.randint是包含左右闭区间的！！
+                color = random.randint(0, 2)  # random.randint bao gồm cả hai đầu mút
             else:
                 tmp_color = random.randint(0, 2)
                 while tmp_color == color:
                     tmp_color = random.randint(0, 2)
                 color = tmp_color
             color_list.append(color)
-            # 这里把对应的通道的颜色给换上去？
+            # Gán dữ liệu vào kênh màu đã chọn
             image_input[:, color, i*image_size_per_var:(i+1)*image_size_per_var, :] = \
                 x_concat_with_masked[:, 0, i*image_size_per_var:(i+1)*image_size_per_var, :]
         
 
-        # output
-        # 这里对x和y也做了norm！！
-        y = (y - means) / stdev # [bs, pred_len, nvars]
-        x = (x - means) / stdev # [bs, seq_len, nvars]
+        # Đầu ra
+        # x và y cũng được chuẩn hóa
+        y = (y - means) / stdev  # [bs, pred_len, nvars]
+        x = (x - means) / stdev  # [bs, seq_len, nvars]
         
         
-        # ! 250424 adds: 这里不需要算pixel loss！
+        # ! 250424 bổ sung: không cần tính pixel loss ở đây
         # # Pixel loss
         # y_true = y[:, :, :] # [bs, Pred_len, nvars]
         # y_mask = torch.ones_like(y_true) # [1, Pred_len, nvars]
@@ -502,30 +538,30 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         # y_mask = rearrange(y_mask, 'b pl n -> b n pl')  # [bs x nvars x seq_len]
         
         # if pad_right != 0:
-        #     # 对最后的pl维度做padding，左边不补，右边补pad_right长度
-        #     y_true = F.pad(y_true, (0, pad_right), mode='replicate') # [1, nvars, Pred_len]
+        #     # Đệm ở chiều pred_len: giữ bên trái, bổ sung pad_right bên phải
+        #     y_true = F.pad(y_true, (0, pad_right), mode='replicate')  # [1, nvars, Pred_len]
         #     y_mask = F.pad(y_mask, (0, pad_right), mode='constant')
         
-        # y_true_with_mask = torch.cat([y_true, y_mask], dim=0) # [2, nvars, Pred_len]
-        # # ! y_true_2d: [2, 1, 周期长度, 周期数] 第一维为2表示：第一个为真实的y值，第二个为y_mask，1表示该位置是有值的（对应真实标签值），0表示无值（即就是空着的mask）
+        # y_true_with_mask = torch.cat([y_true, y_mask], dim=0)  # [2, nvars, Pred_len]
+        # # ! y_true_2d: [2, 1, độ dài chu kỳ, số chu kỳ]; hàng đầu là y thật, hàng thứ hai là y_mask (1: có nhãn, 0: không có)
         # # y_true_2d = rearrange(y_true_with_mask, 'b (p f) -> b 1 f p', f=periodicity)
-        # # ! 250424 adds: y_true_2d.shape = [2, 1, nvars * periodicity, 周期数p]
+        # # ! 250424 bổ sung: y_true_2d.shape = [2, 1, nvars * periodicity, số chu kỳ p]
         # y_true_2d = rearrange(y_true_with_mask, 'b n (p f) -> b 1 (n f) p', f=periodicity)
         
-        # # 预测窗口的pred_len对应的周期数p对应的像素点个数，如19 / 0.83 = 23
+        # # Số điểm ảnh tương ứng với pred_len trong cửa sổ dự báo, ví dụ 19 / 0.83 ≈ 23
         # target_width = int(round(y_true_2d.shape[3] / float(scale_x)))
-        # # 因为mask部分横向一共有112个像素点，剩余的112-23=89个像素点都当作padding处理了！
+        # # Do phần mặt nạ có 112 điểm ảnh ngang nên phần còn lại 112-23=89 được dùng để đệm
         # padding_width = num_patch_output * self.patch_size - target_width
 
-        # # 插值到：[2, 1, Image_Size=224, Target_Width=23]
+        # # Nội suy đến kích thước [2, 1, 224, target_width]
         # y_true_2d = safe_resize((self.image_size, target_width), interpolation=Image.BILINEAR)(y_true_2d)
-        # # y_true_2d右边没有值的部分（还有112-23=89个像素）用0填充，shape为[2, 1, Image_Size=224, Total_Size=112]
+        # # Điền 0 cho phần bên phải không có giá trị (112-23=89), thu được [2, 1, 224, 112]
         # y_true_2d = F.pad(y_true_2d, (0, padding_width), mode='constant')
-        # # y_true_2d.shape: [2, Image_Size=224, Mask_Size=112]
+        # # y_true_2d.shape: [2, 224, 112]
         # y_true_2d = rearrange(y_true_2d, 'b 1 h w -> b h w')
 
         
-        # ! 250425 asdadds: 这里[0]应该还是要保留的，因为0表示batch维度，但是这里应该不需要！
+        # ! 250425 ghi chú: chỉ số [0] vốn nhằm giữ chiều batch, nhưng ở đây có thể bỏ được
         data_entry[field] = image_input.float().numpy()[0]  # [3, 224, 224]
         # data_entry[field + "_img"] = y_true_2d.float().numpy()  # [1, 224, 224]
         # data_entry[field + "_img"] = None  # [1, 224, 224]
@@ -535,7 +571,7 @@ class ImagifyTS_Multivariate(ApplyFuncMixin, Transformation):
         data_entry['pred_len'] = int(pred_len)
         data_entry['periodicity'] = int(periodicity)
         
-        # ! 250425 adds: 这里[0]应该还是要保留的，因为0表示batch维度，但是这里应该不需要！
+        # ! 250425 ghi chú: tương tự, chiều batch được loại bỏ khi chuyển về NumPy
         data_entry['y'] = y.numpy()[0]  # [seq_len, nvars]
         data_entry['x'] = x.numpy()[0]  # [pred_len, nvars]
         data_entry['scale_x'] = float(scale_x)
@@ -622,25 +658,26 @@ class Imagify(ApplyFuncMixin, Transformation):
         scale_x = ((pad_left + context_len) // periodicity) / (int(self.image_size * adjust_input_ratio))
         # output_resize = safe_resize((periodicity, int(round(image_size * scale_x))), interpolation=interpolation)
 
-        # 1. Normalization
-        means = x.mean(1, keepdim=True).detach() # [bs x 1 x nvars]
+        # 1. Chuẩn hóa
+        means = x.mean(1, keepdim=True).detach()  # [bs x 1 x nvars]
         x_enc = x - means
         stdev = torch.sqrt(
-            torch.var(x_enc.to(torch.float64), dim=1, keepdim=True, unbiased=False) + 1e-5) # [bs x 1 x nvars]
+            torch.var(x_enc.to(torch.float64), dim=1, keepdim=True, unbiased=False) + 1e-5
+        )  # [bs x 1 x nvars]
         stdev /= self.norm_const
         x_enc /= stdev
-        # Channel Independent
-        x_enc = rearrange(x_enc, 'b s n -> b n s') # [bs x nvars x seq_len]
+        # Kênh độc lập
+        x_enc = rearrange(x_enc, 'b s n -> b n s')  # [bs x nvars x seq_len]
 
-        
+
         if random.random() < self.pre_mask_prob:
             x_enc[:, :, :int(len(data) * self.max_pre_mask_ratio)] = 0
 
-        # 2. Segmentation
-        x_pad = F.pad(x_enc, (pad_left, 0), mode='replicate') # [b n s]
+        # 2. Phân đoạn
+        x_pad = F.pad(x_enc, (pad_left, 0), mode='replicate')  # [b n s]
         x_2d = rearrange(x_pad, 'b n (p f) -> (b n) 1 f p', f=periodicity)
 
-        # 3. Render & Alignment
+        # 3. Dựng ảnh & Căn chỉnh
         x_resize = input_resize(x_2d)
         masked = torch.zeros((x_2d.shape[0], 1, self.image_size, num_patch_output * self.patch_size), device=x_2d.device, dtype=x_2d.dtype)
         x_concat_with_masked = torch.cat([
@@ -649,7 +686,7 @@ class Imagify(ApplyFuncMixin, Transformation):
         ], dim=-1)
         image_input = repeat(x_concat_with_masked, 'b 1 h w -> b c h w', c=3)
 
-        # output
+        # Đầu ra
         y = (y - means) / stdev
         x = (x - means) / stdev
 
