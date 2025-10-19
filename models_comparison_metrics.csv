@@ -1,0 +1,6 @@
+,MSE,MAE,RMSE,total_points
+ANN,0,0,0,0
+LSTM,0,0,0,0
+GRU,0,0,0,0
+CNN,0,0,0,0
+VisionTS++,0,0,0,0
